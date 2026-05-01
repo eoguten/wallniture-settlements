@@ -2,77 +2,118 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Wallniture — Settlement Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   :root {
-    --bg: #0f1117; --card: #1a1d27; --border: #2a2d3a;
-    --text: #e8eaf0; --muted: #8b8fa8; --accent: #4f8ef7;
-    --green: #34d399; --orange: #fb923c; --red: #f87171;
-    --std: #4f8ef7; --inv: #a78bfa;
+    --bg:#0f1117; --card:#1a1d27; --border:#2a2d3a;
+    --text:#e8eaf0; --muted:#8b8fa8;
+    --green:#34d399; --red:#f87171;
+    --std:#4f8ef7; --inv:#a78bfa;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-         background: var(--bg); color: var(--text); font-size: 13px; }
-  header { padding: 20px 28px 16px; border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: space-between; }
-  header h1 { font-size: 16px; font-weight: 600; }
-  header .sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
-  .updated { font-size: 11px; color: var(--muted); }
-  .container { padding: 20px 28px; max-width: 1400px; margin: 0 auto; }
-  .filters { display: flex; gap: 8px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
-  .filter-btn { padding: 5px 14px; border-radius: 20px; border: 1px solid var(--border);
-                 background: var(--card); color: var(--muted); cursor: pointer; font-size: 12px; transition: all 0.15s; }
-  .filter-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(79,142,247,0.1); }
-  .filter-btn.std.active { border-color: var(--std); color: var(--std); background: rgba(79,142,247,0.1); }
-  .filter-btn.inv.active { border-color: var(--inv); color: var(--inv); background: rgba(167,139,250,0.1); }
-  .filter-label { font-size: 11px; color: var(--muted); margin-right: 4px; }
-  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
-  .kpi { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px 18px; }
-  .kpi .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
-  .kpi .value { font-size: 22px; font-weight: 700; }
-  .kpi .sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
-  .kpi.std .value { color: var(--std); }
-  .kpi.inv .value { color: var(--inv); }
-  .kpi.tot .value { color: var(--green); }
-  .charts { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 20px; }
-  .chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px 18px; }
-  .chart-card h3 { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase;
-                    letter-spacing: .05em; margin-bottom: 14px; }
-  .table-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 20px; overflow: hidden; }
-  .table-card h3 { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase;
-                    letter-spacing: .05em; padding: 14px 18px 12px; border-bottom: 1px solid var(--border); }
-  table { width: 100%; border-collapse: collapse; }
-  thead th { font-size: 11px; font-weight: 600; color: var(--muted); text-align: left;
-              padding: 8px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
-  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
-  tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: rgba(255,255,255,0.03); }
-  tbody td { padding: 9px 14px; vertical-align: middle; }
-  .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 8px;
-            border-radius: 12px; white-space: nowrap; margin-right: 3px; }
-  .badge.std { background: rgba(79,142,247,0.15); color: var(--std); }
-  .badge.inv { background: rgba(167,139,250,0.15); color: var(--inv); }
-  .amount { font-variant-numeric: tabular-nums; text-align: right; }
-  .amount.pos { color: var(--green); }
-  .amount.neg { color: var(--red); }
-  .period { font-size: 12px; color: var(--muted); }
-  .pct-bar-wrap { display: flex; align-items: center; gap: 8px; }
-  .pct-bar { height: 6px; border-radius: 3px; background: var(--accent); opacity: 0.6; min-width: 2px; }
-  .pct-bar.neg { background: var(--red); }
-  .pct-label { font-size: 11px; color: var(--muted); white-space: nowrap; min-width: 38px; text-align: right; }
-  .expand-btn { cursor: pointer; color: var(--muted); font-size: 11px; background: none; border: none; padding: 0; }
-  .expand-btn:hover { color: var(--text); }
-  .breakdown-inner { padding: 6px 14px 10px 32px; }
-  @media (max-width: 700px) { .charts { grid-template-columns: 1fr; } .container { padding: 12px 14px; } }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+        background:var(--bg); color:var(--text); font-size:14px; }
+
+  /* ── Header ── */
+  header{ padding:16px 16px 14px; border-bottom:1px solid var(--border);
+           display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+  header h1{ font-size:15px; font-weight:700; line-height:1.3; }
+  header .sub{ font-size:11px; color:var(--muted); margin-top:2px; }
+  .updated{ font-size:11px; color:var(--muted); white-space:nowrap; padding-top:2px; }
+
+  /* ── Container ── */
+  .container{ padding:16px; max-width:1400px; margin:0 auto; }
+
+  /* ── Filters ── */
+  .filters{ display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; align-items:center; }
+  .filter-label{ font-size:11px; color:var(--muted); }
+  .filter-btn{ padding:6px 14px; border-radius:20px; border:1px solid var(--border);
+               background:var(--card); color:var(--muted); cursor:pointer; font-size:12px;
+               transition:all .15s; -webkit-tap-highlight-color:transparent; }
+  .filter-btn.active{ border-color:var(--std); color:var(--std); background:rgba(79,142,247,.12); }
+  .filter-btn.inv.active{ border-color:var(--inv); color:var(--inv); background:rgba(167,139,250,.12); }
+
+  /* ── KPIs ── */
+  .kpis{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+  .kpi{ background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px 14px; }
+  .kpi .label{ font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:5px; }
+  .kpi .value{ font-size:18px; font-weight:700; line-height:1.2; }
+  .kpi .sub{ font-size:11px; color:var(--muted); margin-top:3px; }
+  .kpi.tot .value{ color:var(--green); }
+  .kpi.std .value{ color:var(--std); }
+  .kpi.inv .value{ color:var(--inv); }
+
+  /* ── Chart cards ── */
+  .chart-card{ background:var(--card); border:1px solid var(--border); border-radius:10px;
+               padding:14px; margin-bottom:12px; }
+  .chart-card h3{ font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase;
+                   letter-spacing:.06em; margin-bottom:12px; }
+
+  /* ── Section card ── */
+  .section-card{ background:var(--card); border:1px solid var(--border); border-radius:10px;
+                  margin-bottom:12px; overflow:hidden; }
+  .section-card h3{ font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase;
+                     letter-spacing:.06em; padding:12px 14px 10px; border-bottom:1px solid var(--border); }
+  .section-note{ font-size:10px; color:var(--muted); font-weight:400; text-transform:none;
+                  letter-spacing:0; display:block; margin-top:2px; }
+
+  /* ── Settlement period cards (mobile-first) ── */
+  .period-card{ padding:12px 14px; border-bottom:1px solid var(--border); }
+  .period-card:last-child{ border-bottom:none; }
+  .period-row1{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px; }
+  .period-dates{ font-size:12px; color:var(--muted); }
+  .period-amount{ font-size:16px; font-weight:700; color:var(--green); white-space:nowrap; }
+  .period-row2{ display:flex; align-items:center; gap:8px; }
+  .period-id{ font-size:10px; color:var(--muted); font-family:monospace; }
+  .expand-btn{ font-size:11px; color:var(--std); background:none; border:none; cursor:pointer;
+               padding:0; margin-left:auto; -webkit-tap-highlight-color:transparent; }
+  .breakdown-body{ display:none; padding:8px 14px 4px; background:rgba(0,0,0,.2); }
+  .breakdown-body.open{ display:block; }
+  .bd-row{ display:flex; justify-content:space-between; padding:4px 0;
+            border-bottom:1px solid rgba(255,255,255,.04); font-size:12px; }
+  .bd-row:last-child{ border-bottom:none; }
+  .bd-key{ color:var(--muted); flex:1; padding-right:8px; }
+  .bd-val{ white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .bd-val.pos{ color:var(--green); }
+  .bd-val.neg{ color:var(--red); }
+
+  /* ── Transaction type rows ── */
+  .txn-row{ padding:10px 14px; border-bottom:1px solid var(--border); }
+  .txn-row:last-child{ border-bottom:none; }
+  .txn-row-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:5px; }
+  .txn-name{ font-size:12px; font-weight:500; flex:1; }
+  .txn-amount{ font-size:13px; font-weight:600; white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .txn-amount.pos{ color:var(--green); }
+  .txn-amount.neg{ color:var(--red); }
+  .txn-row-bot{ display:flex; align-items:center; gap:8px; }
+  .badge{ display:inline-block; font-size:10px; font-weight:600; padding:2px 7px;
+           border-radius:10px; white-space:nowrap; }
+  .badge.std{ background:rgba(79,142,247,.15); color:var(--std); }
+  .badge.inv{ background:rgba(167,139,250,.15); color:var(--inv); }
+  .pct-bar-wrap{ display:flex; align-items:center; gap:6px; flex:1; }
+  .pct-bar{ height:5px; border-radius:3px; background:var(--std); opacity:.65; min-width:2px; }
+  .pct-bar.neg{ background:var(--red); }
+  .pct-label{ font-size:11px; color:var(--muted); white-space:nowrap; }
+
+  /* ── Desktop overrides ── */
+  @media(min-width:640px){
+    .container{ padding:20px 24px; }
+    header{ padding:18px 24px 16px; }
+    header h1{ font-size:16px; }
+    .kpis{ grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px; }
+    .kpi .value{ font-size:22px; }
+    .charts-row{ display:grid; grid-template-columns:2fr 1fr; gap:12px; margin-bottom:12px; }
+    .chart-card{ margin-bottom:0; }
+  }
 </style>
 </head>
 <body>
 <header>
   <div>
     <h1>Wallniture — Settlement Dashboard</h1>
-    <div class="sub">Sellbyeway Corp &nbsp;·&nbsp; US Marketplace</div>
+    <div class="sub">Sellbyeway Corp · US Marketplace</div>
   </div>
   <div class="updated" id="updated-label"></div>
 </header>
@@ -81,192 +122,169 @@
   <div class="filters">
     <span class="filter-label">Show:</span>
     <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
-    <button class="filter-btn std" onclick="setFilter('Standard',this)">Standard Orders</button>
-    <button class="filter-btn inv" onclick="setFilter('Invoiced',this)">Invoiced Orders</button>
+    <button class="filter-btn" onclick="setFilter('Standard',this)">Standard</button>
+    <button class="filter-btn inv" onclick="setFilter('Invoiced',this)">Invoiced</button>
   </div>
 
   <div class="kpis" id="kpis"></div>
 
-  <div class="charts">
+  <div class="charts-row">
     <div class="chart-card">
       <h3>Disbursements by Period</h3>
-      <canvas id="barChart" height="200"></canvas>
+      <canvas id="barChart"></canvas>
     </div>
     <div class="chart-card">
-      <h3>Transaction Type Mix (gross activity)</h3>
-      <canvas id="donutChart" height="200"></canvas>
+      <h3>Transaction Mix</h3>
+      <canvas id="donutChart"></canvas>
     </div>
   </div>
 
-  <div class="table-card">
+  <div class="section-card">
     <h3>Settlement Periods</h3>
-    <table>
-      <thead>
-        <tr>
-          <th></th><th>Type</th><th>Settlement Start</th><th>Settlement End</th>
-          <th>Settlement ID</th><th style="text-align:right">Total Disbursed</th>
-        </tr>
-      </thead>
-      <tbody id="main-tbody"></tbody>
-    </table>
+    <div id="periods-list"></div>
   </div>
 
-  <div class="table-card">
-    <h3>Transaction Type Breakdown &nbsp;<span style="font-weight:400;color:var(--muted);font-size:10px;text-transform:none;letter-spacing:0">% = share of total gross activity (|amount| basis)</span></h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Transaction Type</th><th>Type</th>
-          <th style="text-align:right">Amount</th>
-          <th style="min-width:160px">% of Gross Activity</th>
-        </tr>
-      </thead>
-      <tbody id="txn-tbody"></tbody>
-    </table>
+  <div class="section-card">
+    <h3>Transaction Type Breakdown
+      <span class="section-note">% = share of gross activity</span>
+    </h3>
+    <div id="txn-list"></div>
   </div>
 </div>
 
 <script>
 const ALL_DATA = [{"id": "25297091161", "type": "Standard", "start": "2025-12-29", "end": "2026-01-12", "total": 84981.99, "breakdown": {"Order": 110057.53, "other-transaction": -18026.47, "Refund": -7191.97, "Liquidations": 241.97, "FBAFees": -124.56, "SAFE-T Reimbursement": 25.49, "Order_Retrocharge": 0.0}}, {"id": "25406826951", "type": "Standard", "start": "2026-01-12", "end": "2026-01-26", "total": 65653.03, "breakdown": {"Order": 89551.55, "other-transaction": -14795.64, "Refund": -9340.18, "Liquidations": 237.3, "Order_Retrocharge": 0.0}}, {"id": "25510107901", "type": "Standard", "start": "2026-01-26", "end": "2026-02-09", "total": 58289.33, "breakdown": {"Order": 76450.63, "other-transaction": -10416.94, "Refund": -7752.79, "Liquidations": 167.47, "FBAFees": -159.04, "Refund_Retrocharge": 0.0, "Order_Retrocharge": 0.0}}, {"id": "25630293521", "type": "Standard", "start": "2026-02-09", "end": "2026-02-23", "total": 61271.91, "breakdown": {"Order": 76818.68, "other-transaction": -9429.04, "Refund": -6316.55, "Liquidations": 198.82, "Order_Retrocharge": 0.0, "Refund_Retrocharge": 0.0}}, {"id": "25739632521", "type": "Standard", "start": "2026-02-23", "end": "2026-03-09", "total": 58200.48, "breakdown": {"Order": 77156.53, "other-transaction": -12569.55, "Refund": -6237.17, "Liquidations": 184.72, "FBAFees": -184.05, "ReceivablesDeductions": -150.0, "Order_Retrocharge": 0.0}}, {"id": "25851785651", "type": "Standard", "start": "2026-03-09", "end": "2026-03-23", "total": 50329.83, "breakdown": {"Order": 66767.59, "other-transaction": -10151.52, "Refund": -6457.32, "Liquidations": 171.08, "Refund_Retrocharge": 0.0, "Order_Retrocharge": 0.0, "Liquidations Adjustments": 0.0}}, {"id": "25963304161", "type": "Standard", "start": "2026-03-23", "end": "2026-04-06", "total": 6890.09, "breakdown": {"Order": 17317.31, "other-transaction": -6790.69, "Refund": -3603.56, "Chargeback Refund": -208.14, "Liquidations": 175.17, "Order_Retrocharge": 0.0}}, {"id": "26088228171", "type": "Standard", "start": "2026-04-06", "end": "2026-04-20", "total": 38286.8, "breakdown": {"Order": 51867.39, "other-transaction": -9630.04, "Refund": -4145.02, "Liquidations": 286.44, "FBAFees": -91.97, "Order_Retrocharge": 0.0}}, {"id": "25112857511", "type": "Invoiced", "start": "2025-12-04", "end": "2025-12-18", "total": 2394.19, "breakdown": {"Order": 2437.3, "Refund": -43.11}}, {"id": "25216847031", "type": "Invoiced", "start": "2025-12-18", "end": "2026-01-01", "total": 3018.1, "breakdown": {"Order": 3103.04, "Refund": -84.94}}, {"id": "25326529441", "type": "Invoiced", "start": "2026-01-01", "end": "2026-01-15", "total": 3439.36, "breakdown": {"Order": 3564.84, "Refund": -125.48}}, {"id": "25433069931", "type": "Invoiced", "start": "2026-01-15", "end": "2026-01-29", "total": 1851.42, "breakdown": {"Order": 1949.72, "Refund": -98.3}}, {"id": "25545112191", "type": "Invoiced", "start": "2026-01-29", "end": "2026-02-12", "total": 1886.88, "breakdown": {"Order": 1921.01, "Refund": -34.13}}, {"id": "25663384241", "type": "Invoiced", "start": "2026-02-12", "end": "2026-02-26", "total": 2148.34, "breakdown": {"Order": 2148.34}}, {"id": "25771433441", "type": "Invoiced", "start": "2026-02-26", "end": "2026-03-12", "total": 3239.37, "breakdown": {"Order": 3502.31, "Refund": -262.94}}, {"id": "25881415331", "type": "Invoiced", "start": "2026-03-12", "end": "2026-03-26", "total": 4020.87, "breakdown": {"Order": 4104.95, "Refund": -84.08}}, {"id": "25995798771", "type": "Invoiced", "start": "2026-03-26", "end": "2026-04-09", "total": 1607.2, "breakdown": {"Order": 1607.2}}, {"id": "26123275341", "type": "Invoiced", "start": "2026-04-09", "end": "2026-04-23", "total": 2571.34, "breakdown": {"Order": 2571.34}}];
-let filter = 'all', barChart, donutChart;
+let filter='all', barChart, donutChart;
 
-const fmt = n => '$' + Math.abs(n).toLocaleString('en-US', {minimumFractionDigits:2,maximumFractionDigits:2});
-const fmtSign = n => (n < 0 ? '-' : '') + fmt(n);
+const fmt  = n=>'$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtS = n=>(n<0?'-':'')+fmt(n);
 
-function filtered() { return filter === 'all' ? ALL_DATA : ALL_DATA.filter(s => s.type === filter); }
+function filtered(){ return filter==='all'?ALL_DATA:ALL_DATA.filter(s=>s.type===filter); }
 
-function setFilter(f, btn) {
-  filter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+function setFilter(f,btn){
+  filter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   render();
 }
 
-function render() {
-  const data = filtered();
-  renderKPIs(data); renderBar(data); renderDonut(data); renderTable(data); renderTxnTable(data);
+function render(){
+  const d=filtered();
+  renderKPIs(d); renderBar(d); renderDonut(d); renderPeriods(d); renderTxn(d);
 }
 
-function renderKPIs(data) {
-  const std = data.filter(s => s.type === 'Standard');
-  const inv = data.filter(s => s.type === 'Invoiced');
-  const stdT = std.reduce((a,s)=>a+s.total,0), invT = inv.reduce((a,s)=>a+s.total,0);
-  const grand = data.reduce((a,s)=>a+s.total,0);
-  document.getElementById('kpis').innerHTML = `
-    <div class="kpi tot"><div class="label">Total Disbursed</div><div class="value">${fmt(grand)}</div><div class="sub">${data.length} settlement periods</div></div>
-    <div class="kpi std"><div class="label">Standard Orders</div><div class="value">${fmt(stdT)}</div><div class="sub">${std.length} periods</div></div>
-    <div class="kpi inv"><div class="label">Invoiced Orders</div><div class="value">${fmt(invT)}</div><div class="sub">${inv.length} periods</div></div>
-    <div class="kpi"><div class="label">Avg per Period</div><div class="value" style="color:var(--text)">${data.length?fmt(grand/data.length):'$0'}</div><div class="sub">across all types</div></div>`;
+function renderKPIs(d){
+  const std=d.filter(s=>s.type==='Standard'), inv=d.filter(s=>s.type==='Invoiced');
+  const sT=std.reduce((a,s)=>a+s.total,0), iT=inv.reduce((a,s)=>a+s.total,0), g=sT+iT;
+  document.getElementById('kpis').innerHTML=`
+    <div class="kpi tot"><div class="label">Total Disbursed</div><div class="value">${fmt(g)}</div><div class="sub">${d.length} periods</div></div>
+    <div class="kpi std"><div class="label">Standard</div><div class="value">${fmt(sT)}</div><div class="sub">${std.length} periods</div></div>
+    <div class="kpi inv"><div class="label">Invoiced</div><div class="value">${fmt(iT)}</div><div class="sub">${inv.length} periods</div></div>
+    <div class="kpi"><div class="label">Avg / Period</div><div class="value" style="color:var(--text)">${d.length?fmt(g/d.length):'—'}</div><div class="sub">all types</div></div>`;
 }
 
-function renderBar(data) {
-  const sorted = [...data].sort((a,b)=>a.start.localeCompare(b.start));
-  const labels = sorted.map(s=>s.start.slice(5)+' → '+s.end.slice(5));
-  if (barChart) barChart.destroy();
-  barChart = new Chart(document.getElementById('barChart'), {
-    type: 'bar',
-    data: { labels, datasets: [
-      { label:'Standard', data:sorted.map(s=>s.type==='Standard'?s.total:0), backgroundColor:'rgba(79,142,247,0.75)', borderRadius:3 },
-      { label:'Invoiced',  data:sorted.map(s=>s.type==='Invoiced'?s.total:0),  backgroundColor:'rgba(167,139,250,0.75)', borderRadius:3 }
+function renderBar(d){
+  const s=[...d].sort((a,b)=>a.start.localeCompare(b.start));
+  const labels=s.map(x=>x.start.slice(5)+'→'+x.end.slice(5));
+  if(barChart)barChart.destroy();
+  barChart=new Chart(document.getElementById('barChart'),{
+    type:'bar',
+    data:{labels,datasets:[
+      {label:'Standard',data:s.map(x=>x.type==='Standard'?x.total:0),backgroundColor:'rgba(79,142,247,.75)',borderRadius:3},
+      {label:'Invoiced', data:s.map(x=>x.type==='Invoiced'?x.total:0), backgroundColor:'rgba(167,139,250,.75)',borderRadius:3}
     ]},
-    options: { responsive:true, maintainAspectRatio:true,
-      plugins:{ legend:{ labels:{ color:'#8b8fa8', font:{size:11} } } },
+    options:{responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{labels:{color:'#8b8fa8',font:{size:10},boxWidth:10}}},
       scales:{
-        x:{ stacked:true, ticks:{ color:'#8b8fa8', font:{size:10}, maxRotation:45 }, grid:{ color:'rgba(255,255,255,0.05)' } },
-        y:{ stacked:true, ticks:{ color:'#8b8fa8', font:{size:10}, callback:v=>'$'+(v/1000).toFixed(0)+'k' }, grid:{ color:'rgba(255,255,255,0.05)' } }
+        x:{stacked:true,ticks:{color:'#8b8fa8',font:{size:9},maxRotation:45},grid:{color:'rgba(255,255,255,.05)'}},
+        y:{stacked:true,ticks:{color:'#8b8fa8',font:{size:9},callback:v=>'$'+(v/1000).toFixed(0)+'k'},grid:{color:'rgba(255,255,255,.05)'}}
       }
     }
   });
 }
 
-function renderDonut(data) {
-  const totals={};
-  data.forEach(s=>Object.entries(s.breakdown).forEach(([k,v])=>{ totals[k]=(totals[k]||0)+v; }));
-  const pos = Object.entries(totals).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
-  const colors=['#4f8ef7','#34d399','#a78bfa','#fb923c','#f472b6','#60a5fa','#fbbf24','#a3e635'];
-  if (donutChart) donutChart.destroy();
-  donutChart = new Chart(document.getElementById('donutChart'), {
+function renderDonut(d){
+  const t={};
+  d.forEach(s=>Object.entries(s.breakdown).forEach(([k,v])=>{t[k]=(t[k]||0)+v;}));
+  const pos=Object.entries(t).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,7);
+  const colors=['#4f8ef7','#34d399','#a78bfa','#fb923c','#f472b6','#fbbf24','#60a5fa'];
+  if(donutChart)donutChart.destroy();
+  donutChart=new Chart(document.getElementById('donutChart'),{
     type:'doughnut',
-    data:{ labels:pos.map(([k])=>k), datasets:[{ data:pos.map(([,v])=>v), backgroundColor:colors.slice(0,pos.length), borderWidth:0, hoverOffset:4 }] },
-    options:{ responsive:true, maintainAspectRatio:true, cutout:'62%',
+    data:{labels:pos.map(([k])=>k),datasets:[{data:pos.map(([,v])=>v),backgroundColor:colors,borderWidth:0,hoverOffset:4}]},
+    options:{responsive:true,maintainAspectRatio:true,cutout:'60%',
       plugins:{
-        legend:{ position:'bottom', labels:{ color:'#8b8fa8', font:{size:10}, boxWidth:10, padding:8 } },
-        tooltip:{ callbacks:{ label:ctx=>' '+ctx.label+': $'+ctx.parsed.toLocaleString('en-US',{minimumFractionDigits:2}) } }
+        legend:{position:'bottom',labels:{color:'#8b8fa8',font:{size:10},boxWidth:10,padding:6}},
+        tooltip:{callbacks:{label:ctx=>' '+ctx.label+': '+fmt(ctx.parsed)}}
       }
     }
   });
 }
 
-function renderTable(data) {
-  const sorted = [...data].sort((a,b)=>b.start.localeCompare(a.start));
-  document.getElementById('main-tbody').innerHTML = sorted.map((s,i)=>`
-    <tr>
-      <td><button class="expand-btn" onclick="toggleBD('bd-${i}',this)">▶ details</button></td>
-      <td><span class="badge ${s.type==='Standard'?'std':'inv'}">${s.type}</span></td>
-      <td class="period">${s.start}</td><td class="period">${s.end}</td>
-      <td class="period" style="font-family:monospace;font-size:11px">${s.id}</td>
-      <td class="amount pos">${fmt(s.total)}</td>
-    </tr>
-    <tr id="bd-${i}" style="display:none"><td colspan="6">
-      <div class="breakdown-inner">
-        <table style="width:100%;border-collapse:collapse">
-          <thead><tr>
-            <th style="text-align:left;color:var(--muted);font-size:11px;padding:4px 8px">Transaction Type</th>
-            <th style="text-align:right;color:var(--muted);font-size:11px;padding:4px 8px">Amount</th>
-          </tr></thead>
-          <tbody>${Object.entries(s.breakdown).map(([k,v])=>`
-            <tr><td style="padding:3px 8px;font-size:12px;color:var(--muted)">${k}</td>
-            <td style="text-align:right;padding:3px 8px;font-size:12px" class="amount ${v>=0?'pos':'neg'}">${fmtSign(v)}</td></tr>`).join('')}
-          </tbody>
-        </table>
+function renderPeriods(d){
+  const s=[...d].sort((a,b)=>b.start.localeCompare(a.start));
+  document.getElementById('periods-list').innerHTML=s.map((p,i)=>`
+    <div class="period-card">
+      <div class="period-row1">
+        <div>
+          <span class="badge ${p.type==='Standard'?'std':'inv'}">${p.type}</span>
+        </div>
+        <div class="period-amount">${fmt(p.total)}</div>
       </div>
-    </td></tr>`).join('');
+      <div class="period-row2">
+        <div class="period-dates">${p.start} → ${p.end}</div>
+        <button class="expand-btn" onclick="toggleBD('bd${i}',this)">▶ details</button>
+      </div>
+      <div class="breakdown-body" id="bd${i}">
+        ${Object.entries(p.breakdown).map(([k,v])=>`
+          <div class="bd-row">
+            <span class="bd-key">${k}</span>
+            <span class="bd-val ${v>=0?'pos':'neg'}">${fmtS(v)}</span>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
 }
 
-function toggleBD(id, btn) {
-  const row = document.getElementById(id);
-  const open = row.style.display !== 'none';
-  row.style.display = open ? 'none' : 'table-row';
-  btn.textContent = open ? '▶ details' : '▼ hide';
+function toggleBD(id,btn){
+  const el=document.getElementById(id);
+  const open=el.classList.toggle('open');
+  btn.textContent=open?'▼ hide':'▶ details';
 }
 
-function renderTxnTable(data) {
-  const byType = {};
-  data.forEach(s=>Object.entries(s.breakdown).forEach(([k,v])=>{
-    if (!byType[k]) byType[k]={std:0,inv:0};
-    byType[k][s.type==='Standard'?'std':'inv'] += v;
+function renderTxn(d){
+  const by={};
+  d.forEach(s=>Object.entries(s.breakdown).forEach(([k,v])=>{
+    if(!by[k])by[k]={std:0,inv:0};
+    by[k][s.type==='Standard'?'std':'inv']+=v;
   }));
+  const absSum=Object.values(by).reduce((a,v)=>a+Math.abs(v.std+v.inv),0)||1;
+  const maxAbs=Math.max(...Object.values(by).map(v=>Math.abs(v.std+v.inv)));
+  const rows=Object.entries(by).sort((a,b)=>Math.abs(b[1].std+b[1].inv)-Math.abs(a[1].std+a[1].inv));
 
-  // % of gross activity = |amount| / sum of all |amounts|
-  const absSum = Object.values(byType).reduce((a,v)=>a+Math.abs(v.std+v.inv),0) || 1;
-
-  const rows = Object.entries(byType).sort((a,b)=>Math.abs(b[1].std+b[1].inv)-Math.abs(a[1].std+a[1].inv));
-  const maxAbs = Math.max(...rows.map(([,v])=>Math.abs(v.std+v.inv)));
-
-  document.getElementById('txn-tbody').innerHTML = rows.map(([k,vals])=>{
-    const total = vals.std + vals.inv;
-    const pct   = (Math.abs(total) / absSum * 100).toFixed(1);
-    const barW  = Math.round(Math.abs(total) / maxAbs * 120);
-    const isNeg = total < 0;
-    return `<tr>
-      <td style="font-size:12px">${k}</td>
-      <td>
-        ${vals.std!==0?'<span class="badge std">Standard</span>':''}
-        ${vals.inv!==0?'<span class="badge inv">Invoiced</span>':''}
-      </td>
-      <td class="amount ${isNeg?'neg':'pos'}">${fmtSign(total)}</td>
-      <td>
+  document.getElementById('txn-list').innerHTML=rows.map(([k,v])=>{
+    const total=v.std+v.inv;
+    const pct=(Math.abs(total)/absSum*100).toFixed(1);
+    const barW=Math.round(Math.abs(total)/maxAbs*100);
+    const neg=total<0;
+    return `<div class="txn-row">
+      <div class="txn-row-top">
+        <span class="txn-name">${k}</span>
+        <span class="txn-amount ${neg?'neg':'pos'}">${fmtS(total)}</span>
+      </div>
+      <div class="txn-row-bot">
+        ${v.std!==0?'<span class="badge std">Standard</span>':''}
+        ${v.inv!==0?'<span class="badge inv">Invoiced</span>':''}
         <div class="pct-bar-wrap">
-          <div class="pct-bar ${isNeg?'neg':''}" style="width:${barW}px"></div>
+          <div class="pct-bar ${neg?'neg':''}" style="width:${barW}%"></div>
           <span class="pct-label">${pct}%</span>
         </div>
-      </td>
-    </tr>`;
+      </div>
+    </div>`;
   }).join('');
 }
 
-document.getElementById('updated-label').textContent =
-  'Last updated: ' + new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+document.getElementById('updated-label').textContent=
+  'Updated '+new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 render();
 </script>
 </body>
