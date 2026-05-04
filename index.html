@@ -2,550 +2,375 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wallniture Settlement Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Wallniture — Settlement Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #0f1117; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; }
-  header { background: #1a1d2e; border-bottom: 1px solid #2d3748; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; }
-  header h1 { font-size: 1.4rem; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
-  header h1 span { color: #4f8ef7; }
-  .updated { font-size: 0.78rem; color: #718096; }
-  main { max-width: 1280px; margin: 0 auto; padding: 28px 24px; }
-  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 28px; }
-  .kpi { background: #1a1d2e; border: 1px solid #2d3748; border-radius: 12px; padding: 20px 24px; }
-  .kpi .label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: #718096; margin-bottom: 8px; }
-  .kpi .value { font-size: 1.75rem; font-weight: 700; color: #fff; }
-  .kpi .sub { font-size: 0.78rem; color: #4f8ef7; margin-top: 4px; }
-  .filters { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
-  .filter-btn { background: #1a1d2e; border: 1px solid #2d3748; color: #a0aec0; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; transition: all 0.15s; }
-  .filter-btn:hover { border-color: #4f8ef7; color: #4f8ef7; }
-  .filter-btn.active { background: #4f8ef7; border-color: #4f8ef7; color: #fff; font-weight: 600; }
-  .charts { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 28px; }
-  @media (max-width: 768px) { .charts { grid-template-columns: 1fr; } }
-  .card { background: #1a1d2e; border: 1px solid #2d3748; border-radius: 12px; padding: 24px; }
-  .card h2 { font-size: 0.9rem; font-weight: 600; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 18px; }
-  .chart-wrap { position: relative; height: 280px; }
-  table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-  th { background: #0f1117; color: #718096; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; padding: 10px 14px; text-align: left; border-bottom: 1px solid #2d3748; position: sticky; top: 0; }
-  td { padding: 11px 14px; border-bottom: 1px solid #1e2436; color: #e2e8f0; }
-  tr:last-child td { border-bottom: none; }
-  tr.summary-row:hover td { background: #1e2436; cursor: pointer; }
-  tr.detail-row td { background: #131620; font-size: 0.82rem; color: #a0aec0; }
-  tr.detail-row.hidden { display: none; }
-  .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
-  .badge-standard { background: rgba(79,142,247,0.15); color: #4f8ef7; }
-  .badge-invoiced { background: rgba(167,139,250,0.15); color: #a78bfa; }
-  .amount { font-variant-numeric: tabular-nums; text-align: right; }
-  .positive { color: #68d391; }
-  .negative { color: #fc8181; }
-  .toggle { color: #4f8ef7; font-size: 0.8rem; cursor: pointer; user-select: none; }
-  .table-scroll { overflow-x: auto; border-radius: 8px; }
-  .section-title { font-size: 0.9rem; font-weight: 600; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.8px; margin: 28px 0 14px; }
-  .bar { height: 6px; background: #2d3748; border-radius: 3px; margin-top: 6px; }
-  .bar-fill { height: 100%; border-radius: 3px; background: #4f8ef7; }
+  :root {
+    --bg:#0f1117; --card:#1a1d27; --border:#2a2d3a;
+    --text:#e8eaf0; --muted:#8b8fa8;
+    --green:#34d399; --red:#f87171;
+    --std:#4f8ef7; --inv:#a78bfa;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+        background:var(--bg); color:var(--text); font-size:14px; }
+
+  /* ── Header ── */
+  header{ padding:16px 16px 14px; border-bottom:1px solid var(--border);
+           display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+  header h1{ font-size:15px; font-weight:700; line-height:1.3; }
+  header .sub{ font-size:11px; color:var(--muted); margin-top:2px; }
+  .updated{ font-size:11px; color:var(--muted); white-space:nowrap; padding-top:2px; }
+
+  /* ── Container ── */
+  .container{ padding:16px; max-width:1400px; margin:0 auto; }
+
+  /* ── Filters ── */
+  .filters{ display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; align-items:center; }
+  .filter-label{ font-size:11px; color:var(--muted); }
+  .filter-btn{ padding:6px 14px; border-radius:20px; border:1px solid var(--border);
+               background:var(--card); color:var(--muted); cursor:pointer; font-size:12px;
+               transition:all .15s; -webkit-tap-highlight-color:transparent; }
+  .filter-btn.active{ border-color:var(--std); color:var(--std); background:rgba(79,142,247,.12); }
+  .filter-btn.inv.active{ border-color:var(--inv); color:var(--inv); background:rgba(167,139,250,.12); }
+
+  /* ── KPIs ── */
+  .kpis{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+  .kpi{ background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px 14px; }
+  .kpi .label{ font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:5px; }
+  .kpi .value{ font-size:18px; font-weight:700; line-height:1.2; }
+  .kpi .sub{ font-size:11px; color:var(--muted); margin-top:3px; }
+  .kpi.tot .value{ color:var(--green); }
+  .kpi.std .value{ color:var(--std); }
+  .kpi.inv .value{ color:var(--inv); }
+
+  /* ── Chart cards ── */
+  .chart-card{ background:var(--card); border:1px solid var(--border); border-radius:10px;
+               padding:14px; margin-bottom:12px; }
+  .chart-card h3{ font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase;
+                   letter-spacing:.06em; margin-bottom:12px; }
+
+  /* ── Section card ── */
+  .section-card{ background:var(--card); border:1px solid var(--border); border-radius:10px;
+                  margin-bottom:12px; overflow:hidden; }
+  .section-card h3{ font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase;
+                     letter-spacing:.06em; padding:12px 14px 10px; border-bottom:1px solid var(--border); }
+  .section-note{ font-size:10px; color:var(--muted); font-weight:400; text-transform:none;
+                  letter-spacing:0; display:block; margin-top:2px; }
+
+  /* ── Settlement period cards (mobile-first) ── */
+  .period-card{ padding:12px 14px; border-bottom:1px solid var(--border); }
+  .period-card:last-child{ border-bottom:none; }
+  .period-row1{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px; }
+  .period-dates{ font-size:12px; color:var(--muted); }
+  .period-amount{ font-size:16px; font-weight:700; color:var(--green); white-space:nowrap; }
+  .period-row2{ display:flex; align-items:center; gap:8px; }
+  .period-id{ font-size:10px; color:var(--muted); font-family:monospace; }
+  .expand-btn{ font-size:11px; color:var(--std); background:none; border:none; cursor:pointer;
+               padding:0; margin-left:auto; -webkit-tap-highlight-color:transparent; }
+  .breakdown-body{ display:none; padding:8px 14px 4px; background:rgba(0,0,0,.2); }
+  .breakdown-body.open{ display:block; }
+  .bd-row{ display:flex; justify-content:space-between; padding:4px 0;
+            border-bottom:1px solid rgba(255,255,255,.04); font-size:12px; }
+  .bd-row:last-child{ border-bottom:none; }
+  .bd-key{ color:var(--muted); flex:1; padding-right:8px; }
+  .bd-val{ white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .bd-val.pos{ color:var(--green); }
+  .bd-val.neg{ color:var(--red); }
+
+  /* ── Transaction type rows ── */
+  .txn-row{ padding:10px 14px; border-bottom:1px solid var(--border); }
+  .txn-row:last-child{ border-bottom:none; }
+  .txn-row-top{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:5px; }
+  .txn-name{ font-size:12px; font-weight:500; flex:1; }
+  .txn-amount{ font-size:13px; font-weight:600; white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .txn-amount.pos{ color:var(--green); }
+  .txn-amount.neg{ color:var(--red); }
+  .txn-row-bot{ display:flex; align-items:center; gap:8px; }
+  .badge{ display:inline-block; font-size:10px; font-weight:600; padding:2px 7px;
+           border-radius:10px; white-space:nowrap; }
+  .badge.std{ background:rgba(79,142,247,.15); color:var(--std); }
+  .badge.inv{ background:rgba(167,139,250,.15); color:var(--inv); }
+  .pct-bar-wrap{ display:flex; align-items:center; gap:6px; flex:1; }
+  .pct-bar{ height:5px; border-radius:3px; background:var(--std); opacity:.65; min-width:2px; }
+  .pct-bar.neg{ background:var(--red); }
+  .pct-label{ font-size:11px; color:var(--muted); white-space:nowrap; }
+
+  /* ── Desktop overrides ── */
+  @media(min-width:640px){
+    .container{ padding:20px 24px; }
+    header{ padding:18px 24px 16px; }
+    header h1{ font-size:16px; }
+    .kpis{ grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px; }
+    .kpi .value{ font-size:22px; }
+    .charts-row{ display:grid; grid-template-columns:2fr 1fr; gap:12px; margin-bottom:12px; }
+    .chart-card{ margin-bottom:0; }
+  }
+
+  /* ── Profitability ── */
+  .prof-grid{ display:grid; grid-template-columns:1fr; gap:10px; padding:14px; }
+  @media(min-width:640px){ .prof-grid{ grid-template-columns:repeat(3,1fr); } }
+  .prof-card{ background:rgba(0,0,0,.2); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+  .prof-card .p-label{ font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; font-weight:600; }
+  .prof-row{ display:flex; justify-content:space-between; align-items:center; padding:3px 0;
+             border-bottom:1px solid rgba(255,255,255,.04); font-size:12px; }
+  .prof-row:last-child{ border-bottom:none; }
+  .prof-row .pk{ color:var(--muted); }
+  .prof-row .pv{ font-variant-numeric:tabular-nums; font-weight:500; }
+  .prof-row .pv.green{ color:var(--green); }
+  .prof-row .pv.yellow{ color:#fbbf24; }
+  .margin-bar-wrap{ margin-top:8px; background:rgba(255,255,255,.07); border-radius:4px; height:6px; overflow:hidden; }
+  .margin-bar{ height:100%; border-radius:4px; background:var(--green); }
+  .sku-row{ display:flex; align-items:center; padding:7px 14px; border-bottom:1px solid var(--border); font-size:12px; gap:8px; }
+  .sku-row:last-child{ border-bottom:none; }
+  .sku-code{ font-family:monospace; font-size:11px; color:var(--muted); width:130px; flex-shrink:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .sku-bars{ flex:1; display:flex; flex-direction:column; gap:3px; }
+  .sku-bar-row{ display:flex; align-items:center; gap:5px; }
+  .sku-bar-label{ font-size:9px; color:var(--muted); width:28px; text-align:right; }
+  .sku-bar-bg{ flex:1; background:rgba(255,255,255,.07); border-radius:3px; height:5px; overflow:hidden; }
+  .sku-bar-fill{ height:100%; border-radius:3px; }
+  .sku-bar-fill.rev{ background:var(--std); }
+  .sku-bar-fill.cogs{ background:var(--red); opacity:.7; }
+  .sku-meta{ text-align:right; min-width:68px; flex-shrink:0; }
+  .sku-gp{ font-weight:600; color:var(--green); }
+  .sku-margin{ font-size:10px; color:var(--muted); }
+  .prof-note{ font-size:10px; color:var(--muted); padding:6px 14px 10px; }
 </style>
 </head>
 <body>
 <header>
-  <h1><span>Wallniture</span> Settlement Dashboard</h1>
-  <div class="updated">Last updated: May 04, 2026</div>
+  <div>
+    <h1>Wallniture — Settlement Dashboard</h1>
+    <div class="sub">Sellbyeway Corp · US Marketplace</div>
+  </div>
+  <div class="updated" id="updated-label"></div>
 </header>
-<main>
-  <div class="kpis">
-    <div class="kpi">
-      <div class="label">Total Disbursed</div>
-      <div class="value" id="kpi-total">$492,191.12</div>
-      <div class="sub" id="kpi-periods">19 settlement periods</div>
-    </div>
-    <div class="kpi">
-      <div class="label">Standard Orders</div>
-      <div class="value" id="kpi-standard">$466,014.05</div>
-      <div class="sub">Consumer disbursements</div>
-    </div>
-    <div class="kpi">
-      <div class="label">Invoiced Orders</div>
-      <div class="value" id="kpi-invoiced">$26,177.07</div>
-      <div class="sub">B2B disbursements</div>
-    </div>
-    <div class="kpi">
-      <div class="label">Avg per Period</div>
-      <div class="value" id="kpi-avg">$25,904.80</div>
-      <div class="sub">All periods</div>
-    </div>
-  </div>
 
+<div class="container">
   <div class="filters">
-    <button class="filter-btn active" onclick="setFilter('all', this)">All Periods</button>
-    <button class="filter-btn" onclick="setFilter('Standard', this)">Standard Orders</button>
-    <button class="filter-btn" onclick="setFilter('Invoiced', this)">Invoiced Orders</button>
+    <span class="filter-label">Show:</span>
+    <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+    <button class="filter-btn" onclick="setFilter('Standard',this)">Standard</button>
+    <button class="filter-btn inv" onclick="setFilter('Invoiced',this)">Invoiced</button>
   </div>
 
-  <div class="charts">
-    <div class="card">
-      <h2>Disbursements by Period</h2>
-      <div class="chart-wrap"><canvas id="barChart"></canvas></div>
-    </div>
-    <div class="card">
-      <h2>Revenue Mix</h2>
-      <div class="chart-wrap"><canvas id="doughnutChart"></canvas></div>
-    </div>
-  </div>
+  <div class="kpis" id="kpis"></div>
 
-  <div class="section-title">Settlement Periods</div>
-  <div class="card" style="padding:0">
-    <div class="table-scroll">
-      <table id="periodsTable">
-        <thead>
-          <tr>
-            <th></th>
-            <th>Period</th>
-            <th>Type</th>
-            <th style="text-align:right">Total Amount</th>
-            <th>Settlement ID</th>
-          </tr>
-        </thead>
-        <tbody id="periodsBody"></tbody>
-      </table>
+  <div class="charts-row">
+    <div class="chart-card">
+      <h3>Disbursements by Period</h3>
+      <canvas id="barChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Transaction Mix</h3>
+      <canvas id="donutChart"></canvas>
     </div>
   </div>
 
-  <div class="section-title">Transaction Type Breakdown</div>
-  <div class="card" style="padding:0">
-    <div class="table-scroll">
-      <table id="txnTable">
-        <thead>
-          <tr>
-            <th>Transaction Type</th>
-            <th style="text-align:right">Total Amount</th>
-            <th style="text-align:right">% of Positive</th>
-            <th style="min-width:160px">Share</th>
-          </tr>
-        </thead>
-        <tbody id="txnBody"></tbody>
-      </table>
-    </div>
+  <div class="section-card">
+    <h3>Settlement Periods</h3>
+    <div id="periods-list"></div>
   </div>
-</main>
+
+  <div class="section-card">
+    <h3>Transaction Type Breakdown
+      <span class="section-note">% = share of gross activity</span>
+    </h3>
+    <div id="txn-list"></div>
+  </div>
+
+  <div class="section-card" id="prof-summary-card">
+    <h3>Gross Profit Summary
+      <span class="section-note">Based on shipped orders × COGS lookup · ~87% SKUs mapped by revenue</span>
+    </h3>
+    <div class="prof-grid" id="prof-summary"></div>
+  </div>
+
+  <div class="section-card">
+    <h3>Top 20 SKUs by Revenue — Last 30 Days
+      <span class="section-note">Mapped SKUs only · sorted by revenue</span>
+    </h3>
+    <div id="prof-top20"></div>
+    <div class="prof-note">Revenue coverage: ~90% of total. Unmapped SKUs excluded from COGS calculation.</div>
+  </div>
+</div>
 
 <script>
-const ALL_DATA = [
-  {
-    "id": "25112857511",
-    "type": "Invoiced",
-    "start": "2025-12-04",
-    "end": "2025-12-18",
-    "total": 2394.19,
-    "breakdown": {
-      "Order": 2437.3,
-      "Refund": -43.11
-    },
-    "filename": "settlement_2025_12_04_to_12_18.txt"
-  },
-  {
-    "id": "25216847031",
-    "type": "Invoiced",
-    "start": "2025-12-18",
-    "end": "2026-01-01",
-    "total": 3018.1,
-    "breakdown": {
-      "Order": 3103.04,
-      "Refund": -84.94
-    },
-    "filename": "settlement_2025_12_18_to_01_01.txt"
-  },
-  {
-    "id": "25297091161",
-    "type": "Standard",
-    "start": "2025-12-29",
-    "end": "2026-01-12",
-    "total": 84981.99,
-    "breakdown": {
-      "Order": 110057.53,
-      "other-transaction": -18026.47,
-      "Refund": -7191.97,
-      "Liquidations": 241.97,
-      "FBAFees": -124.56,
-      "SAFE-T Reimbursement": 25.49,
-      "Order_Retrocharge": 0.0
-    },
-    "filename": "settlement_2025_12_29_to_01_12.txt"
-  },
-  {
-    "id": "25326529441",
-    "type": "Invoiced",
-    "start": "2026-01-01",
-    "end": "2026-01-15",
-    "total": 3439.36,
-    "breakdown": {
-      "Order": 3564.84,
-      "Refund": -125.48
-    },
-    "filename": "settlement_2026_01_01_to_01_15.txt"
-  },
-  {
-    "id": "25406826951",
-    "type": "Standard",
-    "start": "2026-01-12",
-    "end": "2026-01-26",
-    "total": 65653.03,
-    "breakdown": {
-      "Order": 89551.55,
-      "other-transaction": -14795.64,
-      "Refund": -9340.18,
-      "Liquidations": 237.3,
-      "Order_Retrocharge": 0.0
-    },
-    "filename": "settlement_2026_01_12_to_01_26.txt"
-  },
-  {
-    "id": "25433069931",
-    "type": "Invoiced",
-    "start": "2026-01-15",
-    "end": "2026-01-29",
-    "total": 1851.42,
-    "breakdown": {
-      "Order": 1949.72,
-      "Refund": -98.3
-    },
-    "filename": "settlement_2026_01_15_to_01_29.txt"
-  },
-  {
-    "id": "25510107901",
-    "type": "Standard",
-    "start": "2026-01-26",
-    "end": "2026-02-09",
-    "total": 58289.33,
-    "breakdown": {
-      "Order": 76450.63,
-      "other-transaction": -10416.94,
-      "Refund": -7752.79,
-      "Liquidations": 167.47,
-      "FBAFees": -159.04,
-      "Refund_Retrocharge": 0.0,
-      "Order_Retrocharge": 0.0
-    },
-    "filename": "settlement_2026_01_26_to_02_09.txt"
-  },
-  {
-    "id": "25545112191",
-    "type": "Invoiced",
-    "start": "2026-01-29",
-    "end": "2026-02-12",
-    "total": 1886.88,
-    "breakdown": {
-      "Order": 1921.01,
-      "Refund": -34.13
-    },
-    "filename": "settlement_2026_01_29_to_02_12.txt"
-  },
-  {
-    "id": "25630293521",
-    "type": "Standard",
-    "start": "2026-02-09",
-    "end": "2026-02-23",
-    "total": 61271.91,
-    "breakdown": {
-      "Order": 76818.68,
-      "other-transaction": -9429.04,
-      "Refund": -6316.55,
-      "Liquidations": 198.82,
-      "Order_Retrocharge": 0.0,
-      "Refund_Retrocharge": 0.0
-    },
-    "filename": "settlement_2026_02_09_to_02_23.txt"
-  },
-  {
-    "id": "25663384241",
-    "type": "Invoiced",
-    "start": "2026-02-12",
-    "end": "2026-02-26",
-    "total": 2148.34,
-    "breakdown": {
-      "Order": 2148.34
-    },
-    "filename": "settlement_2026_02_12_to_02_26.txt"
-  },
-  {
-    "id": "25739632521",
-    "type": "Standard",
-    "start": "2026-02-23",
-    "end": "2026-03-09",
-    "total": 58200.48,
-    "breakdown": {
-      "Order": 77156.53,
-      "other-transaction": -12569.55,
-      "Refund": -6237.17,
-      "Liquidations": 184.72,
-      "FBAFees": -184.05,
-      "ReceivablesDeductions": -150.0,
-      "Order_Retrocharge": 0.0
-    },
-    "filename": "settlement_2026_02_23_to_03_09.txt"
-  },
-  {
-    "id": "25771433441",
-    "type": "Invoiced",
-    "start": "2026-02-26",
-    "end": "2026-03-12",
-    "total": 3239.37,
-    "breakdown": {
-      "Order": 3502.31,
-      "Refund": -262.94
-    },
-    "filename": "settlement_2026_02_26_to_03_12.txt"
-  },
-  {
-    "id": "25851785651",
-    "type": "Standard",
-    "start": "2026-03-09",
-    "end": "2026-03-23",
-    "total": 50329.83,
-    "breakdown": {
-      "Order": 66767.59,
-      "other-transaction": -10151.52,
-      "Refund": -6457.32,
-      "Liquidations": 171.08,
-      "Refund_Retrocharge": 0.0,
-      "Order_Retrocharge": 0.0,
-      "Liquidations Adjustments": 0.0
-    },
-    "filename": "settlement_2026_03_09_to_03_23.txt"
-  },
-  {
-    "id": "25881415331",
-    "type": "Invoiced",
-    "start": "2026-03-12",
-    "end": "2026-03-26",
-    "total": 4020.87,
-    "breakdown": {
-      "Order": 4104.95,
-      "Refund": -84.08
-    },
-    "filename": "settlement_2026_03_12_to_03_26.txt"
-  },
-  {
-    "id": "25963304161",
-    "type": "Standard",
-    "start": "2026-03-23",
-    "end": "2026-04-06",
-    "total": 6890.09,
-    "breakdown": {
-      "Order": 17317.31,
-      "other-transaction": -6790.69,
-      "Refund": -3603.56,
-      "Chargeback Refund": -208.14,
-      "Liquidations": 175.17,
-      "Order_Retrocharge": 0.0
-    },
-    "filename": "settlement_2026_03_23_to_04_06.txt"
-  },
-  {
-    "id": "25995798771",
-    "type": "Invoiced",
-    "start": "2026-03-26",
-    "end": "2026-04-09",
-    "total": 1607.2,
-    "breakdown": {
-      "Order": 1607.2
-    },
-    "filename": "settlement_2026_03_26_to_04_09.txt"
-  },
-  {
-    "id": "26088228171",
-    "type": "Standard",
-    "start": "2026-04-06",
-    "end": "2026-04-20",
-    "total": 38286.8,
-    "breakdown": {
-      "Order": 51867.39,
-      "other-transaction": -9630.04,
-      "Refund": -4145.02,
-      "Liquidations": 286.44,
-      "FBAFees": -91.97,
-      "Order_Retrocharge": 0.0
-    },
-    "filename": "settlement_2026_04_06_to_04_20.txt"
-  },
-  {
-    "id": "26123275341",
-    "type": "Invoiced",
-    "start": "2026-04-09",
-    "end": "2026-04-23",
-    "total": 2571.34,
-    "breakdown": {
-      "Order": 2571.34
-    },
-    "filename": "settlement_2026_04_09_to_04_23.txt"
-  },
-  {
-    "id": "26216292801",
-    "type": "Standard",
-    "start": "2026-04-20",
-    "end": "2026-05-04",
-    "total": 42110.59,
-    "breakdown": {
-      "Order": 58087.53,
-      "other-transaction": -12028.91,
-      "Refund": -4449.84,
-      "Liquidations": 501.81,
-      "Order_Retrocharge": 0.0,
-      "Refund_Retrocharge": 0.0
-    },
-    "filename": "settlement_2026_04_20_to_05_04.txt"
-  }
-];
+const ALL_DATA = [{"id": "25297091161", "type": "Standard", "start": "2025-12-29", "end": "2026-01-12", "total": 84981.99, "breakdown": {"Order": 110057.53, "other-transaction": -18026.47, "Refund": -7191.97, "Liquidations": 241.97, "FBAFees": -124.56, "SAFE-T Reimbursement": 25.49, "Order_Retrocharge": 0.0}}, {"id": "25406826951", "type": "Standard", "start": "2026-01-12", "end": "2026-01-26", "total": 65653.03, "breakdown": {"Order": 89551.55, "other-transaction": -14795.64, "Refund": -9340.18, "Liquidations": 237.3, "Order_Retrocharge": 0.0}}, {"id": "25510107901", "type": "Standard", "start": "2026-01-26", "end": "2026-02-09", "total": 58289.33, "breakdown": {"Order": 76450.63, "other-transaction": -10416.94, "Refund": -7752.79, "Liquidations": 167.47, "FBAFees": -159.04, "Refund_Retrocharge": 0.0, "Order_Retrocharge": 0.0}}, {"id": "25630293521", "type": "Standard", "start": "2026-02-09", "end": "2026-02-23", "total": 61271.91, "breakdown": {"Order": 76818.68, "other-transaction": -9429.04, "Refund": -6316.55, "Liquidations": 198.82, "Order_Retrocharge": 0.0, "Refund_Retrocharge": 0.0}}, {"id": "25739632521", "type": "Standard", "start": "2026-02-23", "end": "2026-03-09", "total": 58200.48, "breakdown": {"Order": 77156.53, "other-transaction": -12569.55, "Refund": -6237.17, "Liquidations": 184.72, "FBAFees": -184.05, "ReceivablesDeductions": -150.0, "Order_Retrocharge": 0.0}}, {"id": "25851785651", "type": "Standard", "start": "2026-03-09", "end": "2026-03-23", "total": 50329.83, "breakdown": {"Order": 66767.59, "other-transaction": -10151.52, "Refund": -6457.32, "Liquidations": 171.08, "Refund_Retrocharge": 0.0, "Order_Retrocharge": 0.0, "Liquidations Adjustments": 0.0}}, {"id": "25963304161", "type": "Standard", "start": "2026-03-23", "end": "2026-04-06", "total": 6890.09, "breakdown": {"Order": 17317.31, "other-transaction": -6790.69, "Refund": -3603.56, "Chargeback Refund": -208.14, "Liquidations": 175.17, "Order_Retrocharge": 0.0}}, {"id": "26088228171", "type": "Standard", "start": "2026-04-06", "end": "2026-04-20", "total": 38286.8, "breakdown": {"Order": 51867.39, "other-transaction": -9630.04, "Refund": -4145.02, "Liquidations": 286.44, "FBAFees": -91.97, "Order_Retrocharge": 0.0}}, {"id": "25112857511", "type": "Invoiced", "start": "2025-12-04", "end": "2025-12-18", "total": 2394.19, "breakdown": {"Order": 2437.3, "Refund": -43.11}}, {"id": "25216847031", "type": "Invoiced", "start": "2025-12-18", "end": "2026-01-01", "total": 3018.1, "breakdown": {"Order": 3103.04, "Refund": -84.94}}, {"id": "25326529441", "type": "Invoiced", "start": "2026-01-01", "end": "2026-01-15", "total": 3439.36, "breakdown": {"Order": 3564.84, "Refund": -125.48}}, {"id": "25433069931", "type": "Invoiced", "start": "2026-01-15", "end": "2026-01-29", "total": 1851.42, "breakdown": {"Order": 1949.72, "Refund": -98.3}}, {"id": "25545112191", "type": "Invoiced", "start": "2026-01-29", "end": "2026-02-12", "total": 1886.88, "breakdown": {"Order": 1921.01, "Refund": -34.13}}, {"id": "25663384241", "type": "Invoiced", "start": "2026-02-12", "end": "2026-02-26", "total": 2148.34, "breakdown": {"Order": 2148.34}}, {"id": "25771433441", "type": "Invoiced", "start": "2026-02-26", "end": "2026-03-12", "total": 3239.37, "breakdown": {"Order": 3502.31, "Refund": -262.94}}, {"id": "25881415331", "type": "Invoiced", "start": "2026-03-12", "end": "2026-03-26", "total": 4020.87, "breakdown": {"Order": 4104.95, "Refund": -84.08}}, {"id": "25995798771", "type": "Invoiced", "start": "2026-03-26", "end": "2026-04-09", "total": 1607.2, "breakdown": {"Order": 1607.2}}, {"id": "26123275341", "type": "Invoiced", "start": "2026-04-09", "end": "2026-04-23", "total": 2571.34, "breakdown": {"Order": 2571.34}}];
 
-let barChart, doughnutChart;
-let currentFilter = 'all';
+const PROF_SUMMARY = [{"label": "Last 30 Days", "revenue": 170066.29, "cogs": 32517.15, "gross_profit": 137549.14, "margin": 80.9, "skus_total": 260, "skus_mapped": 226}, {"label": "Prev 30 Days", "revenue": 198161.79, "cogs": 39387.73, "gross_profit": 158774.06, "margin": 80.1, "skus_total": 270, "skus_mapped": 235}, {"label": "2025 Full Year", "revenue": 3702024.74, "cogs": 721774.1, "gross_profit": 2980250.64, "margin": 80.5, "skus_total": 541, "skus_mapped": 459}];
+const PROF_TOP20   = [{"sku": "AMZ_LGOCLR013", "units": 40, "revenue": 7160.0, "cogs": 1286.8, "gross_profit": 5873.2, "margin": 82.0}, {"sku": "AZ-LI4K-Y7AA", "units": 54, "revenue": 6450.07, "cogs": 1412.1, "gross_profit": 5037.97, "margin": 78.1}, {"sku": "AZ-UE7M-G7SP", "units": 47, "revenue": 4427.82, "cogs": 1016.14, "gross_profit": 3411.68, "margin": 77.1}, {"sku": "AZ-ZX7K-J0XU", "units": 285, "revenue": 4282.8, "cogs": 270.75, "gross_profit": 4012.05, "margin": 93.7}, {"sku": "NC-RM31-LYT6", "units": 40, "revenue": 3806.76, "cogs": 1282.8, "gross_profit": 2523.96, "margin": 66.3}, {"sku": "ZJ-1WP0-BUEV", "units": 257, "revenue": 3697.19, "cogs": 421.48, "gross_profit": 3275.71, "margin": 88.6}, {"sku": "OX-ZWWQ-B1S2", "units": 150, "revenue": 3469.57, "cogs": 816.0, "gross_profit": 2653.57, "margin": 76.5}, {"sku": "AZ-GH3O-Q7PK", "units": 66, "revenue": 3294.36, "cogs": 729.3, "gross_profit": 2565.06, "margin": 77.9}, {"sku": "PF-R3IC-RV96", "units": 107, "revenue": 3110.81, "cogs": 393.76, "gross_profit": 2717.05, "margin": 87.3}, {"sku": "8S-44S3-839Q", "units": 208, "revenue": 2987.91, "cogs": 264.16, "gross_profit": 2723.75, "margin": 91.2}, {"sku": "AMZ_LGOCLR014", "units": 16, "revenue": 2847.89, "cogs": 525.76, "gross_profit": 2322.13, "margin": 81.5}, {"sku": "AMZ_LGO503", "units": 7, "revenue": 2759.02, "cogs": 743.75, "gross_profit": 2015.27, "margin": 73.0}, {"sku": "AZ-AE2F-F2OF", "units": 23, "revenue": 2745.88, "cogs": 612.72, "gross_profit": 2133.16, "margin": 77.7}, {"sku": "SD-LOX4-E1KQ", "units": 45, "revenue": 2676.81, "cogs": 734.85, "gross_profit": 1941.96, "margin": 72.5}, {"sku": "RO-WISZ-NJOG", "units": 61, "revenue": 2433.83, "cogs": 268.4, "gross_profit": 2165.43, "margin": 89.0}, {"sku": "B5-AMVI-2EOC", "units": 39, "revenue": 2405.73, "cogs": 546.0, "gross_profit": 1859.73, "margin": 77.3}, {"sku": "AMZ_LGOCLR016", "units": 17, "revenue": 2346.32, "cogs": 476.34, "gross_profit": 1869.98, "margin": 79.7}, {"sku": "AMZ_LGOCLR015", "units": 13, "revenue": 2262.56, "cogs": 427.18, "gross_profit": 1835.38, "margin": 81.1}, {"sku": "P0-BYS4-VBQF", "units": 21, "revenue": 2033.87, "cogs": 464.52, "gross_profit": 1569.35, "margin": 77.2}, {"sku": "3G-V05Z-DKST", "units": 12, "revenue": 2017.86, "cogs": 442.32, "gross_profit": 1575.54, "margin": 78.1}];
 
-function fmt(n) {
-  return '$' + Math.abs(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
-}
+let filter='all', barChart, donutChart;
 
-function filtered() {
-  if (currentFilter === 'all') return ALL_DATA;
-  return ALL_DATA.filter(s => s.type === currentFilter);
-}
+const fmt  = n=>'$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtS = n=>(n<0?'-':'')+fmt(n);
 
-function setFilter(f, btn) {
-  currentFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+function filtered(){ return filter==='all'?ALL_DATA:ALL_DATA.filter(s=>s.type===filter); }
+
+function setFilter(f,btn){
+  filter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  renderAll();
+  render();
 }
 
-function renderKPIs(data) {
-  const total = data.reduce((s, x) => s + x.total, 0);
-  const std = data.filter(x => x.type==='Standard').reduce((s,x)=>s+x.total,0);
-  const inv = data.filter(x => x.type==='Invoiced').reduce((s,x)=>s+x.total,0);
-  const avg = data.length ? total/data.length : 0;
-  document.getElementById('kpi-total').textContent = fmt(total);
-  document.getElementById('kpi-periods').textContent = data.length + ' settlement periods';
-  document.getElementById('kpi-standard').textContent = fmt(std);
-  document.getElementById('kpi-invoiced').textContent = fmt(inv);
-  document.getElementById('kpi-avg').textContent = fmt(avg);
+
+function renderProfSummary(){
+  const maxRev = Math.max(...PROF_SUMMARY.map(p=>p.revenue));
+  document.getElementById('prof-summary').innerHTML = PROF_SUMMARY.map(p=>`
+    <div class="prof-card">
+      <div class="p-label">${p.label}</div>
+      <div class="prof-row"><span class="pk">Revenue</span><span class="pv">${fmt(p.revenue)}</span></div>
+      <div class="prof-row"><span class="pk">COGS</span><span class="pv yellow">${fmt(p.cogs)}</span></div>
+      <div class="prof-row"><span class="pk">Gross Profit</span><span class="pv green">${fmt(p.gross_profit)}</span></div>
+      <div class="prof-row"><span class="pk">Margin</span><span class="pv green">${p.margin}%</span></div>
+      <div class="prof-row"><span class="pk">SKUs mapped</span><span class="pv">${p.skus_mapped}/${p.skus_total}</span></div>
+      <div class="margin-bar-wrap"><div class="margin-bar" style="width:${p.margin}%"></div></div>
+    </div>`).join('');
 }
 
-function renderBarChart(data) {
-  const labels = data.map(s => s.start.slice(5) + ' – ' + s.end.slice(5));
-  const stdAmts = data.map(s => s.type==='Standard' ? s.total : 0);
-  const invAmts = data.map(s => s.type==='Invoiced' ? s.total : 0);
-  if (barChart) barChart.destroy();
-  barChart = new Chart(document.getElementById('barChart'), {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        { label: 'Standard', data: stdAmts, backgroundColor: '#4f8ef7', borderRadius: 4, borderSkipped: false },
-        { label: 'Invoiced', data: invAmts, backgroundColor: '#a78bfa', borderRadius: 4, borderSkipped: false },
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: '#a0aec0', boxRadius: 4 } } },
-      scales: {
-        x: { stacked: true, ticks: { color: '#718096', maxRotation: 45, font: { size: 10 } }, grid: { color: '#1e2436' } },
-        y: { stacked: true, ticks: { color: '#718096', callback: v => '$' + (v/1000).toFixed(0)+'k' }, grid: { color: '#1e2436' } }
+function renderProfTop20(){
+  const maxRev = Math.max(...PROF_TOP20.map(s=>s.revenue));
+  document.getElementById('prof-top20').innerHTML = PROF_TOP20.map(s=>`
+    <div class="sku-row">
+      <div class="sku-code" title="${s.sku}">${s.sku}</div>
+      <div class="sku-bars">
+        <div class="sku-bar-row">
+          <span class="sku-bar-label">Rev</span>
+          <div class="sku-bar-bg"><div class="sku-bar-fill rev" style="width:${(s.revenue/maxRev*100).toFixed(1)}%"></div></div>
+        </div>
+        <div class="sku-bar-row">
+          <span class="sku-bar-label">COGS</span>
+          <div class="sku-bar-bg"><div class="sku-bar-fill cogs" style="width:${(s.cogs/maxRev*100).toFixed(1)}%"></div></div>
+        </div>
+      </div>
+      <div class="sku-meta">
+        <div class="sku-gp">${fmt(s.gross_profit)}</div>
+        <div class="sku-margin">${s.margin}% margin</div>
+      </div>
+    </div>`).join('');
+}
+
+function render(){
+  const d=filtered();
+  renderKPIs(d); renderBar(d); renderDonut(d); renderPeriods(d); renderTxn(d); renderProfSummary(); renderProfTop20();
+}
+
+function renderKPIs(d){
+  const std=d.filter(s=>s.type==='Standard'), inv=d.filter(s=>s.type==='Invoiced');
+  const sT=std.reduce((a,s)=>a+s.total,0), iT=inv.reduce((a,s)=>a+s.total,0), g=sT+iT;
+  document.getElementById('kpis').innerHTML=`
+    <div class="kpi tot"><div class="label">Total Disbursed</div><div class="value">${fmt(g)}</div><div class="sub">${d.length} periods</div></div>
+    <div class="kpi std"><div class="label">Standard</div><div class="value">${fmt(sT)}</div><div class="sub">${std.length} periods</div></div>
+    <div class="kpi inv"><div class="label">Invoiced</div><div class="value">${fmt(iT)}</div><div class="sub">${inv.length} periods</div></div>
+    <div class="kpi"><div class="label">Avg / Period</div><div class="value" style="color:var(--text)">${d.length?fmt(g/d.length):'—'}</div><div class="sub">all types</div></div>`;
+}
+
+function renderBar(d){
+  const s=[...d].sort((a,b)=>a.start.localeCompare(b.start));
+  const labels=s.map(x=>x.start.slice(5)+'→'+x.end.slice(5));
+  if(barChart)barChart.destroy();
+  barChart=new Chart(document.getElementById('barChart'),{
+    type:'bar',
+    data:{labels,datasets:[
+      {label:'Standard',data:s.map(x=>x.type==='Standard'?x.total:0),backgroundColor:'rgba(79,142,247,.75)',borderRadius:3},
+      {label:'Invoiced', data:s.map(x=>x.type==='Invoiced'?x.total:0), backgroundColor:'rgba(167,139,250,.75)',borderRadius:3}
+    ]},
+    options:{responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{labels:{color:'#8b8fa8',font:{size:10},boxWidth:10}}},
+      scales:{
+        x:{stacked:true,ticks:{color:'#8b8fa8',font:{size:9},maxRotation:45},grid:{color:'rgba(255,255,255,.05)'}},
+        y:{stacked:true,ticks:{color:'#8b8fa8',font:{size:9},callback:v=>'$'+(v/1000).toFixed(0)+'k'},grid:{color:'rgba(255,255,255,.05)'}}
       }
     }
   });
 }
 
-function renderDoughnut(data) {
-  // Aggregate positive breakdown by txn type
-  const totals = {};
-  for (const s of data) {
-    for (const [k,v] of Object.entries(s.breakdown)) {
-      if (v > 0) totals[k] = (totals[k]||0) + v;
-    }
-  }
-  const sorted = Object.entries(totals).sort((a,b)=>b[1]-a[1]);
-  const labels = sorted.map(x=>x[0]);
-  const values = sorted.map(x=>x[1]);
-  const colors = ['#4f8ef7','#a78bfa','#68d391','#f6ad55','#fc8181','#76e4f7','#fbd38d','#b794f4'];
-  if (doughnutChart) doughnutChart.destroy();
-  doughnutChart = new Chart(document.getElementById('doughnutChart'), {
-    type: 'doughnut',
-    data: { labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 2, borderColor: '#1a1d2e' }] },
-    options: {
-      responsive: true, maintainAspectRatio: false, cutout: '65%',
-      plugins: { legend: { position: 'bottom', labels: { color: '#a0aec0', boxRadius: 4, font: { size: 11 }, padding: 12 } } }
+function renderDonut(d){
+  const t={};
+  d.forEach(s=>Object.entries(s.breakdown).forEach(([k,v])=>{t[k]=(t[k]||0)+v;}));
+  const pos=Object.entries(t).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,7);
+  const colors=['#4f8ef7','#34d399','#a78bfa','#fb923c','#f472b6','#fbbf24','#60a5fa'];
+  if(donutChart)donutChart.destroy();
+  donutChart=new Chart(document.getElementById('donutChart'),{
+    type:'doughnut',
+    data:{labels:pos.map(([k])=>k),datasets:[{data:pos.map(([,v])=>v),backgroundColor:colors,borderWidth:0,hoverOffset:4}]},
+    options:{responsive:true,maintainAspectRatio:true,cutout:'60%',
+      plugins:{
+        legend:{position:'bottom',labels:{color:'#8b8fa8',font:{size:10},boxWidth:10,padding:6}},
+        tooltip:{callbacks:{label:ctx=>' '+ctx.label+': '+fmt(ctx.parsed)}}
+      }
     }
   });
 }
 
-function renderPeriodsTable(data) {
-  const tbody = document.getElementById('periodsBody');
-  tbody.innerHTML = '';
-  for (const s of [...data].reverse()) {
-    const row = document.createElement('tr');
-    row.className = 'summary-row';
-    const badge = s.type === 'Standard'
-      ? '<span class="badge badge-standard">Standard</span>'
-      : '<span class="badge badge-invoiced">Invoiced</span>';
-    const amtClass = s.total >= 0 ? 'positive' : 'negative';
-    row.innerHTML = `
-      <td><span class="toggle" onclick="toggleDetail('${s.id}', this)">▶</span></td>
-      <td>${s.start} → ${s.end}</td>
-      <td>${badge}</td>
-      <td class="amount ${amtClass}">${fmt(s.total)}</td>
-      <td style="font-size:0.75rem;color:#718096">${s.id}</td>`;
-    tbody.appendChild(row);
-    // Detail row
-    const drow = document.createElement('tr');
-    drow.className = 'detail-row hidden';
-    drow.id = 'detail-' + s.id;
-    const bkLines = Object.entries(s.breakdown).map(([k,v]) => {
-      const cls = v>=0 ? 'positive':'negative';
-      return `<tr><td style="padding:6px 14px 6px 28px;color:#a0aec0">${k}</td><td class="amount ${cls}" style="padding:6px 14px">${fmt(v)}</td></tr>`;
-    }).join('');
-    drow.innerHTML = `<td colspan="5" style="padding:0"><table style="width:100%">${bkLines}</table></td>`;
-    tbody.appendChild(drow);
-  }
+function renderPeriods(d){
+  const s=[...d].sort((a,b)=>b.start.localeCompare(a.start));
+  document.getElementById('periods-list').innerHTML=s.map((p,i)=>`
+    <div class="period-card">
+      <div class="period-row1">
+        <div>
+          <span class="badge ${p.type==='Standard'?'std':'inv'}">${p.type}</span>
+        </div>
+        <div class="period-amount">${fmt(p.total)}</div>
+      </div>
+      <div class="period-row2">
+        <div class="period-dates">${p.start} → ${p.end}</div>
+        <button class="expand-btn" onclick="toggleBD('bd${i}',this)">▶ details</button>
+      </div>
+      <div class="breakdown-body" id="bd${i}">
+        ${Object.entries(p.breakdown).map(([k,v])=>`
+          <div class="bd-row">
+            <span class="bd-key">${k}</span>
+            <span class="bd-val ${v>=0?'pos':'neg'}">${fmtS(v)}</span>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
 }
 
-function renderTxnTable(data) {
-  const totals = {};
-  for (const s of data) {
-    for (const [k,v] of Object.entries(s.breakdown)) {
-      if (v > 0) totals[k] = (totals[k]||0) + v;
-    }
-  }
-  const grand = Object.values(totals).reduce((a,b)=>a+b,0);
-  const sorted = Object.entries(totals).sort((a,b)=>b[1]-a[1]);
-  const tbody = document.getElementById('txnBody');
-  tbody.innerHTML = '';
-  for (const [k,v] of sorted) {
-    const pct = grand > 0 ? (v/grand*100).toFixed(1) : '0.0';
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${k}</td>
-      <td class="amount positive">${fmt(v)}</td>
-      <td class="amount" style="color:#a0aec0">${pct}%</td>
-      <td><div class="bar"><div class="bar-fill" style="width:${pct}%"></div></div></td>`;
-    tbody.appendChild(tr);
-  }
+function toggleBD(id,btn){
+  const el=document.getElementById(id);
+  const open=el.classList.toggle('open');
+  btn.textContent=open?'▼ hide':'▶ details';
 }
 
-function toggleDetail(id, toggle) {
-  const row = document.getElementById('detail-' + id);
-  if (!row) return;
-  const hidden = row.classList.toggle('hidden');
-  toggle.textContent = hidden ? '▶' : '▼';
+function renderTxn(d){
+  const by={};
+  d.forEach(s=>Object.entries(s.breakdown).forEach(([k,v])=>{
+    if(!by[k])by[k]={std:0,inv:0};
+    by[k][s.type==='Standard'?'std':'inv']+=v;
+  }));
+  const absSum=Object.values(by).reduce((a,v)=>a+Math.abs(v.std+v.inv),0)||1;
+  const maxAbs=Math.max(...Object.values(by).map(v=>Math.abs(v.std+v.inv)));
+  const rows=Object.entries(by).sort((a,b)=>Math.abs(b[1].std+b[1].inv)-Math.abs(a[1].std+a[1].inv));
+
+  document.getElementById('txn-list').innerHTML=rows.map(([k,v])=>{
+    const total=v.std+v.inv;
+    const pct=(Math.abs(total)/absSum*100).toFixed(1);
+    const barW=Math.round(Math.abs(total)/maxAbs*100);
+    const neg=total<0;
+    return `<div class="txn-row">
+      <div class="txn-row-top">
+        <span class="txn-name">${k}</span>
+        <span class="txn-amount ${neg?'neg':'pos'}">${fmtS(total)}</span>
+      </div>
+      <div class="txn-row-bot">
+        ${v.std!==0?'<span class="badge std">Standard</span>':''}
+        ${v.inv!==0?'<span class="badge inv">Invoiced</span>':''}
+        <div class="pct-bar-wrap">
+          <div class="pct-bar ${neg?'neg':''}" style="width:${barW}%"></div>
+          <span class="pct-label">${pct}%</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
-function renderAll() {
-  const data = filtered();
-  renderKPIs(data);
-  renderBarChart(data);
-  renderDoughnut(data);
-  renderPeriodsTable(data);
-  renderTxnTable(data);
-}
-
-renderAll();
+document.getElementById('updated-label').textContent=
+  'Updated '+new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+render();
 </script>
 </body>
 </html>
