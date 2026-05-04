@@ -225,9 +225,9 @@ function renderProfSummary(){
       <div class="prof-row"><span class="pk">Revenue</span><span class="pv">${fmt(p.revenue)}</span></div>
       <div class="prof-row"><span class="pk">COGS</span><span class="pv yellow">${fmt(p.cogs)}</span></div>
       <div class="prof-row"><span class="pk">Gross Profit</span><span class="pv green">${fmt(p.gross_profit)}</span></div>
-      <div class="prof-row"><span class="pk">Margin</span><span class="pv green">${p.margin}%</span></div>
+      <div class="prof-row"><span class="pk">COGS %</span><span class="pv yellow">${(p.cogs/p.revenue*100).toFixed(1)}%</span></div>
       <div class="prof-row"><span class="pk">SKUs mapped</span><span class="pv">${p.skus_mapped}/${p.skus_total}</span></div>
-      <div class="margin-bar-wrap"><div class="margin-bar" style="width:${p.margin}%"></div></div>
+      <div class="margin-bar-wrap" title="COGS as % of revenue"><div class="margin-bar" style="width:${(p.cogs/p.revenue*100).toFixed(1)}%; background:#fbbf24;"></div></div>
     </div>`).join('');
 }
 
@@ -248,7 +248,7 @@ function renderProfTop20(){
       </div>
       <div class="sku-meta">
         <div class="sku-gp">${fmt(s.gross_profit)}</div>
-        <div class="sku-margin">${s.margin}% margin</div>
+        <div class="sku-margin">COGS ${(s.cogs/s.revenue*100).toFixed(1)}%</div>
       </div>
     </div>`).join('');
 }
