@@ -6,110 +6,76 @@
 <title>Wallniture Settlement Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #0f1117; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; }
-  
-  header { background: #161b27; border-bottom: 1px solid #2d3748; padding: 20px 32px; display: flex; justify-content: space-between; align-items: center; }
-  header h1 { font-size: 1.5rem; font-weight: 700; color: #f7fafc; letter-spacing: -0.025em; }
-  header .subtitle { font-size: 0.85rem; color: #718096; margin-top: 2px; }
-  .last-updated { font-size: 0.8rem; color: #4a5568; text-align: right; }
-  .last-updated span { color: #a0aec0; }
-
-  .container { max-width: 1400px; margin: 0 auto; padding: 32px; }
-
-  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
-  .kpi-card { background: #161b27; border: 1px solid #2d3748; border-radius: 12px; padding: 24px; }
-  .kpi-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: #718096; margin-bottom: 8px; }
-  .kpi-value { font-size: 1.8rem; font-weight: 700; color: #f7fafc; }
-  .kpi-value.blue { color: #4f8ef7; }
-  .kpi-value.purple { color: #a78bfa; }
-  .kpi-value.green { color: #68d391; }
-  .kpi-sub { font-size: 0.8rem; color: #4a5568; margin-top: 4px; }
-
+  .header { background: #1a1d2e; border-bottom: 1px solid #2d3047; padding: 20px 32px; display: flex; justify-content: space-between; align-items: center; }
+  .header h1 { font-size: 1.4rem; font-weight: 700; color: #f1f5f9; letter-spacing: -0.02em; }
+  .header h1 span { color: #4f8ef7; }
+  .header .updated { font-size: 0.75rem; color: #64748b; }
+  .container { max-width: 1400px; margin: 0 auto; padding: 24px 32px; }
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+  .kpi { background: #1a1d2e; border: 1px solid #2d3047; border-radius: 12px; padding: 20px 24px; }
+  .kpi .label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; margin-bottom: 8px; }
+  .kpi .value { font-size: 1.75rem; font-weight: 700; color: #f1f5f9; }
+  .kpi .value.blue { color: #4f8ef7; }
+  .kpi .value.purple { color: #a78bfa; }
+  .kpi .value.green { color: #34d399; }
   .filters { display: flex; gap: 8px; margin-bottom: 24px; }
-  .filter-btn { background: #1a2035; border: 1px solid #2d3748; color: #a0aec0; padding: 8px 18px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
-  .filter-btn:hover { border-color: #4f8ef7; color: #e2e8f0; }
-  .filter-btn.active { background: #1e3a5f; border-color: #4f8ef7; color: #4f8ef7; font-weight: 600; }
-
-  .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 32px; }
-  .chart-card { background: #161b27; border: 1px solid #2d3748; border-radius: 12px; padding: 24px; }
-  .chart-title { font-size: 0.9rem; font-weight: 600; color: #a0aec0; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .filter-btn { padding: 8px 20px; border-radius: 20px; border: 1px solid #2d3047; background: transparent; color: #94a3b8; cursor: pointer; font-size: 0.82rem; transition: all 0.2s; }
+  .filter-btn:hover { border-color: #4f8ef7; color: #4f8ef7; }
+  .filter-btn.active { background: #4f8ef7; border-color: #4f8ef7; color: #fff; font-weight: 600; }
+  .charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 28px; }
+  .card { background: #1a1d2e; border: 1px solid #2d3047; border-radius: 12px; padding: 24px; }
+  .card h2 { font-size: 0.85rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 20px; }
   .chart-wrap { position: relative; }
-
-  .section-title { font-size: 0.85rem; font-weight: 600; color: #718096; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; }
-
-  table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-  thead tr { background: #1a2035; }
-  th { padding: 12px 16px; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: #718096; font-weight: 600; border-bottom: 1px solid #2d3748; }
-  td { padding: 12px 16px; border-bottom: 1px solid #1a2035; color: #cbd5e0; }
-  tr:hover td { background: #1a2035; }
-  .table-card { background: #161b27; border: 1px solid #2d3748; border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
-  .table-header { padding: 20px 24px 0; }
-
-  .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
-  .badge-standard { background: #1e3a5f; color: #4f8ef7; }
-  .badge-invoiced { background: #2d1f4f; color: #a78bfa; }
-  
-  .amount { text-align: right; font-family: 'SF Mono', 'Courier New', monospace; }
-  .amount.positive { color: #68d391; }
-  .amount.negative { color: #fc8181; }
-
-  .toggle-btn { background: none; border: none; color: #718096; cursor: pointer; font-size: 0.85rem; padding: 2px 6px; transition: color 0.2s; }
-  .toggle-btn:hover { color: #a0aec0; }
-  .breakdown-row { display: none; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+  th { text-align: left; padding: 10px 12px; color: #64748b; font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid #2d3047; }
+  td { padding: 11px 12px; border-bottom: 1px solid #1e2235; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #1e2235; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 0.72rem; font-weight: 600; }
+  .badge-std { background: rgba(79,142,247,0.15); color: #4f8ef7; }
+  .badge-inv { background: rgba(167,139,250,0.15); color: #a78bfa; }
+  .toggle-btn { background: transparent; border: none; color: #64748b; cursor: pointer; font-size: 0.85rem; padding: 2px 6px; border-radius: 4px; transition: color 0.2s; }
+  .toggle-btn:hover { color: #e2e8f0; }
+  .breakdown-row { display: none; background: #141624; }
   .breakdown-row.open { display: table-row; }
-  .breakdown-row td { background: #0d1120; padding: 16px 24px; }
-  .breakdown-inner { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
-  .breakdown-item { display: flex; justify-content: space-between; padding: 6px 12px; background: #161b27; border-radius: 6px; border: 1px solid #2d3748; font-size: 0.8rem; }
-  .breakdown-item-label { color: #a0aec0; }
-  .breakdown-item-value { font-family: monospace; }
-
-  .pct-bar { display: flex; align-items: center; gap: 8px; }
-  .pct-track { flex: 1; height: 4px; background: #2d3748; border-radius: 2px; overflow: hidden; }
-  .pct-fill-s { height: 100%; background: #4f8ef7; border-radius: 2px; }
-  .pct-fill-i { height: 100%; background: #a78bfa; border-radius: 2px; }
-  .pct-fill-g { height: 100%; background: #68d391; border-radius: 2px; }
-  .pct-fill-r { height: 100%; background: #fc8181; border-radius: 2px; }
-  .pct-val { font-size: 0.75rem; color: #718096; min-width: 40px; text-align: right; }
-
+  .breakdown-cell { padding: 12px 12px 12px 28px; }
+  .breakdown-table { width: 100%; font-size: 0.78rem; }
+  .breakdown-table td { padding: 4px 8px; border: none; color: #94a3b8; }
+  .breakdown-table td:first-child { color: #cbd5e1; }
+  .amount { font-variant-numeric: tabular-nums; }
+  .positive { color: #34d399; }
+  .negative { color: #f87171; }
+  .tables-row { display: grid; grid-template-columns: 3fr 2fr; gap: 16px; }
   @media (max-width: 900px) {
-    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-    .charts-grid { grid-template-columns: 1fr; }
+    .kpi-row { grid-template-columns: 1fr 1fr; }
+    .charts-row, .tables-row { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
-
-<header>
-  <div>
-    <h1>Wallniture · Settlement Dashboard</h1>
-    <div class="subtitle">Amazon Marketplace · US · Disbursement Summary</div>
-  </div>
-  <div class="last-updated">Last updated<br><span>May 05, 2026</span></div>
-</header>
-
+<div class="header">
+  <h1>Wallniture <span>Settlement Reports</span></h1>
+  <div class="updated">Last updated: May 06, 2026</div>
+</div>
 <div class="container">
-
-  <div class="kpi-grid">
-    <div class="kpi-card">
-      <div class="kpi-label">Total Disbursed</div>
-      <div class="kpi-value green" id="kpi-total">$492,191.12</div>
-      <div class="kpi-sub" id="kpi-periods">19 settlement periods</div>
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="label">Total Disbursed</div>
+      <div class="value green" id="kpi-total">$492,191</div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Standard Orders</div>
-      <div class="kpi-value blue" id="kpi-standard">$466,014.05</div>
-      <div class="kpi-sub" id="kpi-standard-count">9 periods</div>
+    <div class="kpi">
+      <div class="label">Standard Orders</div>
+      <div class="value blue" id="kpi-std">$466,014</div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Invoiced Orders</div>
-      <div class="kpi-value purple" id="kpi-invoiced">$26,177.07</div>
-      <div class="kpi-sub" id="kpi-invoiced-count">10 periods</div>
+    <div class="kpi">
+      <div class="label">Invoiced Orders</div>
+      <div class="value purple" id="kpi-inv">$26,177</div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Avg per Period</div>
-      <div class="kpi-value" id="kpi-avg">$25,904.80</div>
-      <div class="kpi-sub" id="kpi-avg-sub">19 unique periods</div>
+    <div class="kpi">
+      <div class="label">Avg per Period</div>
+      <div class="value" id="kpi-avg">$25,905</div>
     </div>
   </div>
 
@@ -119,57 +85,59 @@
     <button class="filter-btn" onclick="setFilter('Invoiced')">Invoiced Orders</button>
   </div>
 
-  <div class="charts-grid">
-    <div class="chart-card">
-      <div class="chart-title">Disbursements by Period</div>
-      <div class="chart-wrap"><canvas id="barChart" height="260"></canvas></div>
+  <div class="charts-row">
+    <div class="card">
+      <h2>Disbursements by Period</h2>
+      <div class="chart-wrap" style="height:260px">
+        <canvas id="barChart"></canvas>
+      </div>
     </div>
-    <div class="chart-card">
-      <div class="chart-title">Transaction Type Mix</div>
-      <div class="chart-wrap"><canvas id="doughnutChart" height="260"></canvas></div>
+    <div class="card">
+      <h2>Transaction Type Mix</h2>
+      <div class="chart-wrap" style="height:260px">
+        <canvas id="doughnutChart"></canvas>
+      </div>
     </div>
   </div>
 
-  <div class="table-card">
-    <div class="table-header"><div class="section-title">Settlement Periods</div></div>
-    <table>
-      <thead>
-        <tr>
-          <th></th>
-          <th>Settlement Period</th>
-          <th>Type</th>
-          <th>Settlement ID</th>
-          <th class="amount">Total Disbursed</th>
-        </tr>
-      </thead>
-      <tbody id="settlementsBody"></tbody>
-    </table>
+  <div class="tables-row">
+    <div class="card">
+      <h2>Settlement Periods</h2>
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Period</th>
+            <th>Type</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody id="periodsTable"></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h2>Transaction Type Breakdown</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Transaction Type</th>
+            <th>Amount</th>
+            <th>% of Total</th>
+          </tr>
+        </thead>
+        <tbody id="txTable"></tbody>
+      </table>
+    </div>
   </div>
-
-  <div class="table-card">
-    <div class="table-header"><div class="section-title">Transaction Type Breakdown</div></div>
-    <table>
-      <thead>
-        <tr>
-          <th>Transaction Type</th>
-          <th class="amount">Amount</th>
-          <th>Share</th>
-        </tr>
-      </thead>
-      <tbody id="txnBody"></tbody>
-    </table>
-  </div>
-
 </div>
 
 <script>
 const ALL_DATA = [{"id": "25112857511", "type": "Invoiced", "start": "2025-12-04", "end": "2025-12-18", "total": 2394.19, "breakdown": {"Order": 2437.3, "Refund": -43.11}, "filename": "settlement_2025_12_04_to_12_18.txt"}, {"id": "25216847031", "type": "Invoiced", "start": "2025-12-18", "end": "2026-01-01", "total": 3018.1, "breakdown": {"Order": 3103.04, "Refund": -84.94}, "filename": "settlement_2025_12_18_to_01_01.txt"}, {"id": "25297091161", "type": "Standard", "start": "2025-12-29", "end": "2026-01-12", "total": 84981.99, "breakdown": {"Order": 110057.53, "other-transaction": -18026.47, "Liquidations": 241.97, "Refund": -7191.97, "Order_Retrocharge": 0.0, "FBAFees": -124.56, "SAFE-T Reimbursement": 25.49}, "filename": "settlement_2025_12_29_to_01_12.txt"}, {"id": "25326529441", "type": "Invoiced", "start": "2026-01-01", "end": "2026-01-15", "total": 3439.36, "breakdown": {"Order": 3564.84, "Refund": -125.48}, "filename": "settlement_2026_01_01_to_01_15.txt"}, {"id": "25406826951", "type": "Standard", "start": "2026-01-12", "end": "2026-01-26", "total": 65653.03, "breakdown": {"Order": 89551.55, "other-transaction": -14795.64, "Liquidations": 237.3, "Refund": -9340.18, "Order_Retrocharge": 0.0}, "filename": "settlement_2026_01_12_to_01_26.txt"}, {"id": "25433069931", "type": "Invoiced", "start": "2026-01-15", "end": "2026-01-29", "total": 1851.42, "breakdown": {"Order": 1949.72, "Refund": -98.3}, "filename": "settlement_2026_01_15_to_01_29.txt"}, {"id": "25510107901", "type": "Standard", "start": "2026-01-26", "end": "2026-02-09", "total": 58289.33, "breakdown": {"Order": 76450.63, "Refund": -7752.79, "other-transaction": -10416.94, "Liquidations": 167.47, "Refund_Retrocharge": 0.0, "Order_Retrocharge": 0.0, "FBAFees": -159.04}, "filename": "settlement_2026_01_26_to_02_09.txt"}, {"id": "25545112191", "type": "Invoiced", "start": "2026-01-29", "end": "2026-02-12", "total": 1886.88, "breakdown": {"Order": 1921.01, "Refund": -34.13}, "filename": "settlement_2026_01_29_to_02_12.txt"}, {"id": "25630293521", "type": "Standard", "start": "2026-02-09", "end": "2026-02-23", "total": 61271.91, "breakdown": {"Order": 76818.68, "Refund": -6316.55, "other-transaction": -9429.04, "Liquidations": 198.82, "Order_Retrocharge": 0.0, "Refund_Retrocharge": 0.0}, "filename": "settlement_2026_02_09_to_02_23.txt"}, {"id": "25663384241", "type": "Invoiced", "start": "2026-02-12", "end": "2026-02-26", "total": 2148.34, "breakdown": {"Order": 2148.34}, "filename": "settlement_2026_02_12_to_02_26.txt"}, {"id": "25739632521", "type": "Standard", "start": "2026-02-23", "end": "2026-03-09", "total": 58200.48, "breakdown": {"Order": 77156.53, "other-transaction": -12569.55, "Liquidations": 184.72, "Refund": -6237.17, "Order_Retrocharge": 0.0, "ReceivablesDeductions": -150.0, "FBAFees": -184.05}, "filename": "settlement_2026_02_23_to_03_09.txt"}, {"id": "25771433441", "type": "Invoiced", "start": "2026-02-26", "end": "2026-03-12", "total": 3239.37, "breakdown": {"Order": 3502.31, "Refund": -262.94}, "filename": "settlement_2026_02_26_to_03_12.txt"}, {"id": "25851785651", "type": "Standard", "start": "2026-03-09", "end": "2026-03-23", "total": 50329.83, "breakdown": {"Order": 66767.59, "other-transaction": -10151.52, "Liquidations": 171.08, "Refund": -6457.32, "Refund_Retrocharge": 0.0, "Order_Retrocharge": 0.0, "Liquidations Adjustments": 0.0}, "filename": "settlement_2026_03_09_to_03_23.txt"}, {"id": "25881415331", "type": "Invoiced", "start": "2026-03-12", "end": "2026-03-26", "total": 4020.87, "breakdown": {"Order": 4104.95, "Refund": -84.08}, "filename": "settlement_2026_03_12_to_03_26.txt"}, {"id": "25963304161", "type": "Standard", "start": "2026-03-23", "end": "2026-04-06", "total": 6890.09, "breakdown": {"Order": 17317.31, "Refund": -3603.56, "other-transaction": -6790.69, "Liquidations": 175.17, "Order_Retrocharge": 0.0, "Chargeback Refund": -208.14}, "filename": "settlement_2026_03_23_to_04_06.txt"}, {"id": "25995798771", "type": "Invoiced", "start": "2026-03-26", "end": "2026-04-09", "total": 1607.2, "breakdown": {"Order": 1607.2}, "filename": "settlement_2026_03_26_to_04_09.txt"}, {"id": "26088228171", "type": "Standard", "start": "2026-04-06", "end": "2026-04-20", "total": 38286.8, "breakdown": {"Order": 51867.39, "Refund": -4145.02, "other-transaction": -9630.04, "Liquidations": 286.44, "FBAFees": -91.97, "Order_Retrocharge": 0.0}, "filename": "settlement_2026_04_06_to_04_20.txt"}, {"id": "26123275341", "type": "Invoiced", "start": "2026-04-09", "end": "2026-04-23", "total": 2571.34, "breakdown": {"Order": 2571.34}, "filename": "settlement_2026_04_09_to_04_23.txt"}, {"id": "26216292801", "type": "Standard", "start": "2026-04-20", "end": "2026-05-04", "total": 42110.59, "breakdown": {"Order": 58087.53, "Refund": -4449.84, "Liquidations": 501.81, "other-transaction": -12028.91, "Order_Retrocharge": 0.0, "Refund_Retrocharge": 0.0}, "filename": "settlement_2026_04_20_to_05_04.txt"}];
 
 let currentFilter = 'all';
-let barChart, doughnutChart;
 
 function fmt(n) {
-  return (n < 0 ? '-' : '') + '$' + Math.abs(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  return '$' + n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
 }
 
 function filtered() {
@@ -177,192 +145,144 @@ function filtered() {
   return ALL_DATA.filter(s => s.type === currentFilter);
 }
 
-function setFilter(f) {
-  currentFilter = f;
-  document.querySelectorAll('.filter-btn').forEach((btn, i) => {
-    btn.classList.toggle('active', (i === 0 && f === 'all') || btn.textContent.includes(f));
-  });
-  updateAll();
-}
+let barChart, doughnutChart;
 
-function updateKPIs(data) {
-  const total = data.reduce((a, s) => a + s.total, 0);
-  const std = data.filter(s => s.type === 'Standard').reduce((a, s) => a + s.total, 0);
-  const inv = data.filter(s => s.type === 'Invoiced').reduce((a, s) => a + s.total, 0);
-  const periods = new Set(data.map(s => s.start + '|' + s.end)).size;
-  const avg = periods > 0 ? total / periods : 0;
-  document.getElementById('kpi-total').textContent = fmt(total);
-  document.getElementById('kpi-periods').textContent = data.length + ' settlement periods';
-  document.getElementById('kpi-standard').textContent = fmt(std);
-  document.getElementById('kpi-standard-count').textContent = data.filter(s => s.type === 'Standard').length + ' periods';
-  document.getElementById('kpi-invoiced').textContent = fmt(inv);
-  document.getElementById('kpi-invoiced-count').textContent = data.filter(s => s.type === 'Invoiced').length + ' periods';
-  document.getElementById('kpi-avg').textContent = fmt(avg);
-  document.getElementById('kpi-avg-sub').textContent = periods + ' unique periods';
-}
-
-function updateBarChart(data) {
-  // Sort data by start date
-  const sorted = [...data].sort((a, b) => a.start.localeCompare(b.start));
-  
-  // Build period labels and datasets
-  const labels = sorted.map(s => {
-    const start = s.start.slice(5);
-    const end = s.end.slice(5);
-    return start + ' → ' + end;
-  });
-  
-  const stdVals = sorted.map(s => s.type === 'Standard' ? s.total : 0);
-  const invVals = sorted.map(s => s.type === 'Invoiced' ? s.total : 0);
+function buildCharts(data) {
+  const labels = data.map(s => s.start.slice(5) + ' – ' + s.end.slice(5));
+  const stdAmounts = data.map(s => s.type === 'Standard' ? s.total : 0);
+  const invAmounts = data.map(s => s.type === 'Invoiced' ? s.total : 0);
 
   if (barChart) barChart.destroy();
-  const ctx = document.getElementById('barChart').getContext('2d');
-  barChart = new Chart(ctx, {
+  const bCtx = document.getElementById('barChart').getContext('2d');
+  barChart = new Chart(bCtx, {
     type: 'bar',
     data: {
       labels,
       datasets: [
-        { label: 'Standard Orders', data: stdVals, backgroundColor: '#4f8ef7', borderRadius: 4 },
-        { label: 'Invoiced Orders', data: invVals, backgroundColor: '#a78bfa', borderRadius: 4 },
+        { label: 'Standard', data: stdAmounts, backgroundColor: '#4f8ef7', borderRadius: 4, borderSkipped: false },
+        { label: 'Invoiced', data: invAmounts, backgroundColor: '#a78bfa', borderRadius: 4, borderSkipped: false }
       ]
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { labels: { color: '#a0aec0', font: { size: 12 } } },
-        tooltip: {
-          callbacks: {
-            label: ctx => ctx.dataset.label + ': ' + fmt(ctx.parsed.y)
-          }
-        }
-      },
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } }, tooltip: { callbacks: { label: ctx => ' ' + fmt(ctx.parsed.y) } } },
       scales: {
-        x: { stacked: true, ticks: { color: '#718096', maxRotation: 45, font: { size: 10 } }, grid: { color: '#1a2035' } },
-        y: { stacked: true, ticks: { color: '#718096', callback: v => '$' + (v/1000).toFixed(0) + 'k' }, grid: { color: '#1a2035' } }
+        x: { stacked: true, ticks: { color: '#64748b', font: { size: 9 }, maxRotation: 45, minRotation: 30 }, grid: { color: '#1e2235' } },
+        y: { stacked: true, ticks: { color: '#64748b', callback: v => '$' + (v/1000).toFixed(0) + 'k' }, grid: { color: '#1e2235' } }
       }
     }
   });
-}
 
-function updateDoughnut(data) {
-  // Aggregate transaction types (positive amounts only)
-  const txnMap = {};
+  // Doughnut: aggregate positive tx types across filtered data
+  const txAgg = {};
   data.forEach(s => {
     Object.entries(s.breakdown).forEach(([k, v]) => {
-      if (v > 0) txnMap[k] = (txnMap[k] || 0) + v;
+      if (v > 0) txAgg[k] = (txAgg[k] || 0) + v;
     });
   });
-  
-  const entries = Object.entries(txnMap).sort((a, b) => b[1] - a[1]).slice(0, 8);
-  const labels = entries.map(e => e[0]);
-  const vals = entries.map(e => e[1]);
-  
-  const palette = ['#4f8ef7','#a78bfa','#68d391','#f6ad55','#fc8181','#76e4f7','#f687b3','#faf089'];
+  const txKeys = Object.keys(txAgg).sort((a,b) => txAgg[b] - txAgg[a]);
+  const colors = ['#4f8ef7','#a78bfa','#34d399','#fbbf24','#f87171','#38bdf8','#fb923c','#e879f9'];
 
   if (doughnutChart) doughnutChart.destroy();
-  const ctx = document.getElementById('doughnutChart').getContext('2d');
-  doughnutChart = new Chart(ctx, {
+  const dCtx = document.getElementById('doughnutChart').getContext('2d');
+  doughnutChart = new Chart(dCtx, {
     type: 'doughnut',
     data: {
-      labels,
-      datasets: [{ data: vals, backgroundColor: palette, borderWidth: 2, borderColor: '#161b27' }]
+      labels: txKeys,
+      datasets: [{ data: txKeys.map(k => txAgg[k]), backgroundColor: colors.slice(0, txKeys.length), borderWidth: 2, borderColor: '#1a1d2e' }]
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
+      responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: { position: 'bottom', labels: { color: '#a0aec0', font: { size: 11 }, boxWidth: 12, padding: 12 } },
-        tooltip: {
-          callbacks: {
-            label: ctx => ' ' + ctx.label + ': ' + fmt(ctx.parsed)
-          }
-        }
+        legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 }, padding: 10 } },
+        tooltip: { callbacks: { label: ctx => ' ' + fmt(ctx.parsed) } }
       }
     }
   });
 }
 
-function updateTable(data) {
-  const sorted = [...data].sort((a, b) => a.start.localeCompare(b.start));
-  const tbody = document.getElementById('settlementsBody');
+function buildPeriodsTable(data) {
+  const tbody = document.getElementById('periodsTable');
   tbody.innerHTML = '';
-  
-  sorted.forEach((s, i) => {
-    const mainRow = document.createElement('tr');
-    mainRow.style.cursor = 'pointer';
-    mainRow.innerHTML = `
-      <td><button class="toggle-btn" onclick="toggleBreakdown(${i}, event)">▶</button></td>
-      <td>${s.start} → ${s.end}</td>
-      <td><span class="badge badge-${s.type.toLowerCase()}">${s.type}</span></td>
-      <td style="font-family:monospace;font-size:0.8rem;color:#4a5568">${s.id || '—'}</td>
-      <td class="amount ${s.total >= 0 ? 'positive' : 'negative'}">${fmt(s.total)}</td>
-    `;
-    tbody.appendChild(mainRow);
-    
-    // Breakdown row
-    const bkRow = document.createElement('tr');
-    bkRow.className = 'breakdown-row';
-    bkRow.id = 'bk-' + i;
-    const items = Object.entries(s.breakdown)
-      .sort((a, b) => b[1] - a[1])
-      .map(([k, v]) => `<div class="breakdown-item"><span class="breakdown-item-label">${k}</span><span class="breakdown-item-value ${v >= 0 ? 'positive' : 'negative'}">${fmt(v)}</span></div>`)
-      .join('');
-    bkRow.innerHTML = `<td colspan="5"><div class="breakdown-inner">${items}</div></td>`;
-    tbody.appendChild(bkRow);
-  });
-}
-
-function toggleBreakdown(i, e) {
-  e.stopPropagation();
-  const row = document.getElementById('bk-' + i);
-  const btn = e.target;
-  const isOpen = row.classList.toggle('open');
-  btn.textContent = isOpen ? '▼' : '▶';
-}
-
-function updateTxnTable(data) {
-  const txnMap = {};
-  data.forEach(s => {
-    Object.entries(s.breakdown).forEach(([k, v]) => {
-      txnMap[k] = (txnMap[k] || 0) + v;
-    });
-  });
-  
-  const totalAbs = Object.values(txnMap).reduce((a, v) => a + Math.abs(v), 0);
-  const entries = Object.entries(txnMap).sort((a, b) => b[1] - a[1]);
-  
-  const tbody = document.getElementById('txnBody');
-  tbody.innerHTML = '';
-  
-  entries.forEach(([txn, amt]) => {
-    const pct = totalAbs > 0 ? (Math.abs(amt) / totalAbs * 100) : 0;
-    const fillClass = amt > 0 ? 'pct-fill-g' : 'pct-fill-r';
+  data.forEach((s, idx) => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${txn}</td>
-      <td class="amount ${amt >= 0 ? 'positive' : 'negative'}">${fmt(amt)}</td>
-      <td>
-        <div class="pct-bar">
-          <div class="pct-track"><div class="${fillClass}" style="width:${pct.toFixed(1)}%"></div></div>
-          <div class="pct-val">${pct.toFixed(1)}%</div>
-        </div>
-      </td>
+      <td><button class="toggle-btn" onclick="toggleBreakdown(${idx})">▶</button></td>
+      <td class="amount">${s.start} → ${s.end}</td>
+      <td><span class="badge ${s.type==='Standard'?'badge-std':'badge-inv'}">${s.type}</span></td>
+      <td class="amount ${s.total>=0?'positive':'negative'}">${fmt(s.total)}</td>
     `;
+    tbody.appendChild(tr);
+
+    const breakdownTr = document.createElement('tr');
+    breakdownTr.className = 'breakdown-row';
+    breakdownTr.id = 'bd-' + idx;
+    const breakdownItems = Object.entries(s.breakdown)
+      .sort((a,b) => b[1]-a[1])
+      .map(([k,v]) => `<tr><td>${k}</td><td class="amount ${v>=0?'positive':'negative'}">${fmt(v)}</td></tr>`)
+      .join('');
+    breakdownTr.innerHTML = `<td class="breakdown-cell" colspan="4"><table class="breakdown-table">${breakdownItems}</table></td>`;
+    tbody.appendChild(breakdownTr);
+  });
+}
+
+function toggleBreakdown(idx) {
+  const row = document.getElementById('bd-' + idx);
+  const btn = row.previousElementSibling.querySelector('.toggle-btn');
+  if (row.classList.contains('open')) {
+    row.classList.remove('open');
+    btn.textContent = '▶';
+  } else {
+    row.classList.add('open');
+    btn.textContent = '▼';
+  }
+}
+
+function buildTxTable(data) {
+  const txAgg = {};
+  let posTotal = 0;
+  data.forEach(s => {
+    Object.entries(s.breakdown).forEach(([k, v]) => {
+      txAgg[k] = (txAgg[k] || 0) + v;
+      if (v > 0) posTotal += v;
+    });
+  });
+  const txSorted = Object.entries(txAgg).sort((a,b) => b[1]-a[1]);
+  const tbody = document.getElementById('txTable');
+  tbody.innerHTML = '';
+  txSorted.forEach(([k, v]) => {
+    const pct = posTotal > 0 && v > 0 ? (v/posTotal*100).toFixed(1) + '%' : '—';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${k}</td><td class="amount ${v>=0?'positive':'negative'}">${fmt(v)}</td><td>${pct}</td>`;
     tbody.appendChild(tr);
   });
 }
 
-function updateAll() {
-  const data = filtered();
-  updateKPIs(data);
-  updateBarChart(data);
-  updateDoughnut(data);
-  updateTable(data);
-  updateTxnTable(data);
+function updateKPIs(data) {
+  const total = data.reduce((s,x) => s+x.total, 0);
+  const std = data.filter(x=>x.type==='Standard').reduce((s,x)=>s+x.total,0);
+  const inv = data.filter(x=>x.type==='Invoiced').reduce((s,x)=>s+x.total,0);
+  const avg = data.length ? total/data.length : 0;
+  document.getElementById('kpi-total').textContent = '$' + total.toLocaleString('en-US',{maximumFractionDigits:0});
+  document.getElementById('kpi-std').textContent = '$' + std.toLocaleString('en-US',{maximumFractionDigits:0});
+  document.getElementById('kpi-inv').textContent = '$' + inv.toLocaleString('en-US',{maximumFractionDigits:0});
+  document.getElementById('kpi-avg').textContent = '$' + avg.toLocaleString('en-US',{maximumFractionDigits:0});
 }
 
-updateAll();
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach((b,i) => {
+    b.classList.toggle('active', ['all','Standard','Invoiced'][i] === f);
+  });
+  const data = filtered();
+  buildCharts(data);
+  buildPeriodsTable(data);
+  buildTxTable(data);
+  updateKPIs(data);
+}
+
+// Initial render
+setFilter('all');
 </script>
 </body>
 </html>
