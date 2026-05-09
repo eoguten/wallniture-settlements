@@ -377,7 +377,7 @@ function setFilter(btn){
 
 function render(){
   var data = filtered();
-  var sorted = data.slice().sort(function(a,b){ return a.start_date < b.start_date ? -1 : 1; });
+  var sorted = data.slice().sort(function(a,b){ return a.start_date > b.start_date ? -1 : 1; });
   var std = data.filter(function(s){ return s.type==='Standard'; });
   var inv = data.filter(function(s){ return s.type==='Invoiced'; });
   var total = data.reduce(function(a,s){ return a+s.total; }, 0);
