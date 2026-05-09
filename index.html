@@ -6,77 +6,73 @@
 <title>Wallniture Settlement Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #0f1117; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; }
-  header { background: #161b22; border-bottom: 1px solid #30363d; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
-  header h1 { font-size: 1.25rem; font-weight: 600; color: #f0f6fc; }
-  .updated { font-size: 0.75rem; color: #8b949e; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
-  .filter-bar { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
-  .filter-btn { padding: 6px 16px; border-radius: 6px; border: 1px solid #30363d; background: #161b22; color: #8b949e; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
-  .filter-btn:hover { border-color: #58a6ff; color: #58a6ff; }
-  .filter-btn.active { background: #1f6feb; border-color: #1f6feb; color: #fff; }
-  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
-  .kpi { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 20px; }
-  .kpi-label { font-size: 0.75rem; color: #8b949e; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
-  .kpi-value { font-size: 1.6rem; font-weight: 700; color: #f0f6fc; }
-  .kpi-sub { font-size: 0.75rem; color: #8b949e; margin-top: 4px; }
-  .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 28px; }
-  @media (max-width: 700px) { .charts-grid { grid-template-columns: 1fr; } }
-  .chart-card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 20px; }
-  .chart-card h2 { font-size: 0.9rem; color: #8b949e; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em; }
-  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-  th { text-align: left; padding: 10px 12px; color: #8b949e; font-weight: 500; border-bottom: 1px solid #30363d; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
-  td { padding: 10px 12px; border-bottom: 1px solid #21262d; color: #c9d1d9; }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: #1c2128; }
-  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
-  .badge-standard { background: #1c3a6b; color: #4f8ef7; }
-  .badge-invoiced { background: #2e1e5c; color: #a78bfa; }
-  .amount-pos { color: #3fb950; }
-  .amount-neg { color: #f85149; }
-  .table-card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 20px; margin-bottom: 20px; overflow-x: auto; }
-  .table-card h2 { font-size: 0.9rem; color: #8b949e; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em; }
-  .toggle-btn { background: none; border: none; color: #58a6ff; cursor: pointer; font-size: 0.8rem; padding: 2px 6px; border-radius: 4px; }
-  .breakdown-row { display: none; }
-  .breakdown-row td { background: #0d1117; font-size: 0.8rem; color: #8b949e; padding: 6px 12px 6px 32px; }
-  .breakdown-row.open { display: table-row; }
-  .pct-bar { display: inline-block; height: 8px; border-radius: 4px; background: #4f8ef7; vertical-align: middle; margin-right: 8px; }
-  .summary-row td { font-weight: 600; color: #f0f6fc !important; border-top: 1px solid #30363d; }
-  .new-badge { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 0.65rem; font-weight: 700; background: #1a4731; color: #3fb950; margin-left: 6px; vertical-align: middle; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f1117;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
+header{background:#161b22;border-bottom:1px solid #30363d;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+header h1{font-size:1.25rem;font-weight:600;color:#f0f6fc}
+.updated{font-size:.75rem;color:#8b949e}
+.container{max-width:1200px;margin:0 auto;padding:24px}
+.filter-bar{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+.filter-btn{padding:6px 16px;border-radius:6px;border:1px solid #30363d;background:#161b22;color:#8b949e;cursor:pointer;font-size:.85rem;transition:all .2s}
+.filter-btn:hover{border-color:#58a6ff;color:#58a6ff}
+.filter-btn.active{background:#1f6feb;border-color:#1f6feb;color:#fff}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px}
+.kpi{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:20px}
+.kpi-label{font-size:.75rem;color:#8b949e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.kpi-value{font-size:1.6rem;font-weight:700;color:#f0f6fc}
+.kpi-sub{font-size:.75rem;color:#8b949e;margin-top:4px}
+.charts-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:28px}
+@media(max-width:700px){.charts-grid{grid-template-columns:1fr}}
+.chart-card{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:20px}
+.chart-card h2{font-size:.9rem;color:#8b949e;margin-bottom:16px;text-transform:uppercase;letter-spacing:.05em}
+/* Critical: chart container must have explicit height for Chart.js responsive mode */
+.chart-wrap{position:relative;height:280px;width:100%}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th{text-align:left;padding:10px 12px;color:#8b949e;font-weight:500;border-bottom:1px solid #30363d;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em}
+td{padding:10px 12px;border-bottom:1px solid #21262d;color:#c9d1d9}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#1c2128}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.7rem;font-weight:600}
+.badge-std{background:#1c3a6b;color:#4f8ef7}
+.badge-inv{background:#2e1e5c;color:#a78bfa}
+.pos{color:#3fb950}
+.neg{color:#f85149}
+.table-card{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:20px;margin-bottom:20px;overflow-x:auto}
+.table-card h2{font-size:.9rem;color:#8b949e;margin-bottom:16px;text-transform:uppercase;letter-spacing:.05em}
+.toggle-btn{background:none;border:none;color:#58a6ff;cursor:pointer;font-size:.85rem;padding:2px 8px;border-radius:4px;line-height:1}
+.toggle-btn:hover{background:#1c2d48}
+.bd-row{display:none}
+.bd-row td{background:#0d1117;font-size:.8rem;color:#8b949e;padding:5px 12px 5px 36px}
+.bd-row.open{display:table-row}
+.pct-bar{display:inline-block;height:8px;border-radius:4px;vertical-align:middle;margin-right:8px}
+.net-row td{font-weight:700;color:#f0f6fc!important;border-top:1px solid #30363d}
 </style>
 </head>
 <body>
 <header>
-  <h1>🏦 Wallniture · Settlement Reports</h1>
-  <span class="updated">Last updated: 2026-05-09 23:09 UTC</span>
+  <h1>&#x1F3E6; Wallniture &middot; Settlement Reports</h1>
+  <span class="updated">Last updated: 2026-05-09 23:21 UTC</span>
 </header>
 <div class="container">
   <div class="filter-bar">
-    <button class="filter-btn active" onclick="setFilter('All')">All Periods</button>
-    <button class="filter-btn" onclick="setFilter('Standard')">Standard Orders</button>
-    <button class="filter-btn" onclick="setFilter('Invoiced')">Invoiced Orders</button>
+    <button class="filter-btn active" data-filter="All" onclick="setFilter(this)">All Periods</button>
+    <button class="filter-btn" data-filter="Standard" onclick="setFilter(this)">Standard Orders</button>
+    <button class="filter-btn" data-filter="Invoiced" onclick="setFilter(this)">Invoiced Orders</button>
   </div>
   <div class="kpi-grid">
-    <div class="kpi"><div class="kpi-label">Total Disbursed</div><div class="kpi-value" id="kpi-total">—</div><div class="kpi-sub" id="kpi-periods">— periods</div></div>
-    <div class="kpi"><div class="kpi-label">Standard Orders</div><div class="kpi-value" id="kpi-standard">—</div><div class="kpi-sub" id="kpi-std-count">— periods</div></div>
-    <div class="kpi"><div class="kpi-label">Invoiced Orders</div><div class="kpi-value" id="kpi-invoiced">—</div><div class="kpi-sub" id="kpi-inv-count">— periods</div></div>
+    <div class="kpi"><div class="kpi-label">Total Disbursed</div><div class="kpi-value" id="kpi-total">—</div><div class="kpi-sub" id="kpi-periods">—</div></div>
+    <div class="kpi"><div class="kpi-label">Standard Orders</div><div class="kpi-value" id="kpi-std">—</div><div class="kpi-sub" id="kpi-std-n">—</div></div>
+    <div class="kpi"><div class="kpi-label">Invoiced Orders</div><div class="kpi-value" id="kpi-inv">—</div><div class="kpi-sub" id="kpi-inv-n">—</div></div>
     <div class="kpi"><div class="kpi-label">Avg per Period</div><div class="kpi-value" id="kpi-avg">—</div><div class="kpi-sub">per settlement</div></div>
   </div>
   <div class="charts-grid">
-    <div class="chart-card">
-      <h2>Disbursements by Period</h2>
-      <canvas id="barChart" height="280"></canvas>
-    </div>
-    <div class="chart-card">
-      <h2>Type Mix</h2>
-      <canvas id="doughnutChart" height="280"></canvas>
-    </div>
+    <div class="chart-card"><h2>Disbursements by Period</h2><div class="chart-wrap"><canvas id="barChart"></canvas></div></div>
+    <div class="chart-card"><h2>Type Mix</h2><div class="chart-wrap"><canvas id="doughnutChart"></canvas></div></div>
   </div>
   <div class="table-card">
     <h2>Settlement Periods</h2>
-    <table id="periods-table">
-      <thead><tr><th></th><th>Period</th><th>Type</th><th>Deposit Date</th><th style="text-align:right">Total</th><th>Settlement ID</th></tr></thead>
+    <table>
+      <thead><tr><th style="width:40px"></th><th>Period</th><th>Type</th><th>Deposit Date</th><th style="text-align:right">Total</th><th>Settlement ID</th></tr></thead>
       <tbody id="periods-tbody"></tbody>
     </table>
   </div>
@@ -89,7 +85,7 @@
   </div>
 </div>
 <script>
-const ALL_DATA = [
+var ALL_DATA = [
   {
     "id": "25112857511",
     "filename": "settlement_2025_12_04_to_12_18.txt",
@@ -406,111 +402,190 @@ const ALL_DATA = [
     }
   }
 ];
-let currentFilter = 'All';
-let barChart = null, doughnutChart = null;
 
-function fmt(v) { return '$' + Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-function fmtSigned(v) { const s = fmt(v); return v < 0 ? '-' + s : s; }
+var currentFilter = 'All';
+var barChart = null;
+var doughnutChart = null;
 
-function filteredData() {
-  return currentFilter === 'All' ? ALL_DATA : ALL_DATA.filter(s => s.type === currentFilter);
+function dollar(v) {
+  return '$' + Math.abs(v).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function signed(v) {
+  return (v < 0 ? '-' : '') + dollar(v);
 }
 
-function setFilter(f) {
-  currentFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => {
-    b.classList.toggle('active', (f==='All' && b.textContent==='All Periods') || b.textContent.startsWith(f));
+function filtered() {
+  if (currentFilter === 'All') return ALL_DATA;
+  return ALL_DATA.filter(function(s) { return s.type === currentFilter; });
+}
+
+function setFilter(btn) {
+  currentFilter = btn.getAttribute('data-filter');
+  document.querySelectorAll('.filter-btn').forEach(function(b) {
+    b.classList.toggle('active', b === btn);
   });
   render();
 }
 
 function render() {
-  const data = filteredData();
-  const sorted = [...data].sort((a,b) => a.start_date.localeCompare(b.start_date));
-  const std = data.filter(s=>s.type==='Standard'), inv = data.filter(s=>s.type==='Invoiced');
-  const totalAll = data.reduce((a,s)=>a+s.total,0);
-  const totalStd = std.reduce((a,s)=>a+s.total,0), totalInv = inv.reduce((a,s)=>a+s.total,0);
-  const avg = data.length > 0 ? totalAll/data.length : 0;
+  var data = filtered();
+  var sorted = data.slice().sort(function(a,b){ return a.start_date < b.start_date ? -1 : 1; });
 
-  document.getElementById('kpi-total').textContent = fmt(totalAll);
+  var std = data.filter(function(s){ return s.type==='Standard'; });
+  var inv = data.filter(function(s){ return s.type==='Invoiced'; });
+  var total = data.reduce(function(a,s){ return a+s.total; }, 0);
+  var totalStd = std.reduce(function(a,s){ return a+s.total; }, 0);
+  var totalInv = inv.reduce(function(a,s){ return a+s.total; }, 0);
+  var avg = data.length > 0 ? total/data.length : 0;
+
+  document.getElementById('kpi-total').textContent = dollar(total);
   document.getElementById('kpi-periods').textContent = data.length + ' period' + (data.length!==1?'s':'');
-  document.getElementById('kpi-standard').textContent = fmt(totalStd);
-  document.getElementById('kpi-std-count').textContent = std.length + ' period' + (std.length!==1?'s':'');
-  document.getElementById('kpi-invoiced').textContent = fmt(totalInv);
-  document.getElementById('kpi-inv-count').textContent = inv.length + ' period' + (inv.length!==1?'s':'');
-  document.getElementById('kpi-avg').textContent = fmt(avg);
+  document.getElementById('kpi-std').textContent = dollar(totalStd);
+  document.getElementById('kpi-std-n').textContent = std.length + ' period' + (std.length!==1?'s':'');
+  document.getElementById('kpi-inv').textContent = dollar(totalInv);
+  document.getElementById('kpi-inv-n').textContent = inv.length + ' period' + (inv.length!==1?'s':'');
+  document.getElementById('kpi-avg').textContent = dollar(avg);
 
-  const labels = sorted.map(s => s.start_date.slice(5)+'→'+s.end_date.slice(5));
-  const stdAmts = sorted.map(s => s.type==='Standard' ? s.total : 0);
-  const invAmts = sorted.map(s => s.type==='Invoiced' ? s.total : 0);
+  // Bar chart
+  var labels = sorted.map(function(s){ return s.start_date.slice(5) + ' → ' + s.end_date.slice(5); });
+  var stdAmts = sorted.map(function(s){ return s.type==='Standard' ? s.total : 0; });
+  var invAmts = sorted.map(function(s){ return s.type==='Invoiced' ? s.total : 0; });
 
-  if (barChart) barChart.destroy();
-  barChart = new Chart(document.getElementById('barChart').getContext('2d'), {
-    type:'bar', data:{labels,datasets:[
-      {label:'Standard',data:stdAmts,backgroundColor:'#4f8ef7',stack:'s'},
-      {label:'Invoiced',data:invAmts,backgroundColor:'#a78bfa',stack:'s'}
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{labels:{color:'#8b949e'}},tooltip:{callbacks:{label:ctx=>' '+ctx.dataset.label+': $'+ctx.raw.toLocaleString('en-US',{minimumFractionDigits:2})}}},
-      scales:{x:{stacked:true,ticks:{color:'#8b949e',font:{size:9}},grid:{color:'#21262d'}},
-               y:{stacked:true,ticks:{color:'#8b949e',callback:v=>'$'+(v/1000).toFixed(0)+'k'},grid:{color:'#21262d'}}}
+  if (barChart) { barChart.destroy(); barChart = null; }
+  var barCtx = document.getElementById('barChart').getContext('2d');
+  barChart = new Chart(barCtx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {label:'Standard', data:stdAmts, backgroundColor:'#4f8ef7', stack:'s'},
+        {label:'Invoiced',  data:invAmts, backgroundColor:'#a78bfa', stack:'s'}
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color:'#8b949e' } },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              return ' ' + ctx.dataset.label + ': ' + dollar(ctx.raw);
+            }
+          }
+        }
+      },
+      scales: {
+        x: { stacked:true, ticks:{ color:'#8b949e', font:{size:9} }, grid:{ color:'#21262d' } },
+        y: { stacked:true, ticks:{ color:'#8b949e', callback: function(v){ return '$'+(v/1000).toFixed(0)+'k'; } }, grid:{ color:'#21262d' } }
+      }
     }
   });
 
-  if (doughnutChart) doughnutChart.destroy();
-  doughnutChart = new Chart(document.getElementById('doughnutChart').getContext('2d'), {
-    type:'doughnut', data:{labels:['Standard','Invoiced'],datasets:[{data:[totalStd,totalInv],backgroundColor:['#4f8ef7','#a78bfa'],borderColor:'#0f1117',borderWidth:3}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8b949e',padding:12}},tooltip:{callbacks:{label:ctx=>' '+ctx.label+': $'+ctx.raw.toLocaleString('en-US',{minimumFractionDigits:2})}}}}
+  // Doughnut chart
+  if (doughnutChart) { doughnutChart.destroy(); doughnutChart = null; }
+  var dCtx = document.getElementById('doughnutChart').getContext('2d');
+  doughnutChart = new Chart(dCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Standard','Invoiced'],
+      datasets: [{
+        data: [totalStd, totalInv],
+        backgroundColor: ['#4f8ef7','#a78bfa'],
+        borderColor: '#0f1117',
+        borderWidth: 3
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position:'bottom', labels:{ color:'#8b949e', padding:12 } },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) { return ' ' + ctx.label + ': ' + dollar(ctx.raw); }
+          }
+        }
+      }
+    }
   });
 
-  const tbody = document.getElementById('periods-tbody');
+  // Periods table
+  var tbody = document.getElementById('periods-tbody');
   tbody.innerHTML = '';
-  sorted.forEach((s,i) => {
-    const bc = s.type==='Standard'?'badge-standard':'badge-invoiced';
-    const row = document.createElement('tr');
-    row.innerHTML = `<td><button class="toggle-btn" onclick="toggleBd('bd${i}',this)">▶</button></td>
-      <td>${s.start_date} → ${s.end_date}</td>
-      <td><span class="badge ${bc}">${s.type}</span></td>
-      <td>${s.deposit_date}</td>
-      <td style="text-align:right" class="${s.total>=0?'amount-pos':'amount-neg'}">${fmtSigned(s.total)}</td>
-      <td style="font-size:0.75rem;color:#8b949e">${s.id}</td>`;
-    tbody.appendChild(row);
-    Object.entries(s.breakdown).forEach(([tx,amt]) => {
-      const br = document.createElement('tr');
-      br.className='breakdown-row'; br.setAttribute('data-group','bd'+i);
-      br.innerHTML=`<td></td><td colspan="3" style="color:#8b949e">${tx}</td><td style="text-align:right" class="${amt>=0?'amount-pos':'amount-neg'}">${fmtSigned(amt)}</td><td></td>`;
+  sorted.forEach(function(s, i) {
+    var badgeCls = s.type==='Standard' ? 'badge-std' : 'badge-inv';
+    var amtCls   = s.total >= 0 ? 'pos' : 'neg';
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td><button class="toggle-btn" data-group="g'+i+'" onclick="toggleGroup(this)">&#9654;</button></td>' +
+      '<td>' + s.start_date + ' &rarr; ' + s.end_date + '</td>' +
+      '<td><span class="badge ' + badgeCls + '">' + s.type + '</span></td>' +
+      '<td>' + s.deposit_date + '</td>' +
+      '<td style="text-align:right" class="' + amtCls + '">' + signed(s.total) + '</td>' +
+      '<td style="font-size:.75rem;color:#8b949e">' + s.id + '</td>';
+    tbody.appendChild(tr);
+    Object.keys(s.breakdown).forEach(function(tx) {
+      var amt = s.breakdown[tx];
+      var br = document.createElement('tr');
+      br.className = 'bd-row';
+      br.setAttribute('data-group', 'g'+i);
+      br.innerHTML =
+        '<td></td>' +
+        '<td colspan="3" style="color:#8b949e">' + tx + '</td>' +
+        '<td style="text-align:right" class="' + (amt>=0?'pos':'neg') + '">' + signed(amt) + '</td>' +
+        '<td></td>';
       tbody.appendChild(br);
     });
   });
 
-  const allBk = {};
-  data.forEach(s=>Object.entries(s.breakdown).forEach(([k,v])=>{ allBk[k]=(allBk[k]||0)+v; }));
-  const gross = Object.values(allBk).filter(v=>v>0).reduce((a,b)=>a+b,0);
-  const txSorted = Object.entries(allBk).sort((a,b)=>b[1]-a[1]);
-  const txTbody = document.getElementById('tx-tbody');
-  txTbody.innerHTML='';
-  txSorted.forEach(([tx,amt]) => {
-    const pct = gross>0?(Math.abs(amt)/gross*100):0;
-    const tr = document.createElement('tr');
-    tr.innerHTML=`<td>${tx}</td><td style="text-align:right" class="${amt>=0?'amount-pos':'amount-neg'}">${fmtSigned(amt)}</td>
-      <td style="text-align:right;color:#8b949e">${pct.toFixed(1)}%</td>
-      <td><span class="pct-bar" style="width:${Math.min(120,pct*1.2)}px;background:${amt>=0?'#3fb950':'#f85149'}"></span></td>`;
+  // Transaction breakdown table
+  var allBk = {};
+  data.forEach(function(s) {
+    Object.keys(s.breakdown).forEach(function(k) {
+      allBk[k] = (allBk[k] || 0) + s.breakdown[k];
+    });
+  });
+  var gross = 0;
+  Object.keys(allBk).forEach(function(k){ if(allBk[k]>0) gross += allBk[k]; });
+  var txEntries = Object.keys(allBk).map(function(k){ return [k, allBk[k]]; });
+  txEntries.sort(function(a,b){ return b[1]-a[1]; });
+
+  var txTbody = document.getElementById('tx-tbody');
+  txTbody.innerHTML = '';
+  txEntries.forEach(function(entry) {
+    var tx = entry[0], amt = entry[1];
+    var pct = gross > 0 ? (Math.abs(amt)/gross*100) : 0;
+    var barW = Math.min(120, pct * 1.2);
+    var barColor = amt >= 0 ? '#3fb950' : '#f85149';
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td>' + tx + '</td>' +
+      '<td style="text-align:right" class="' + (amt>=0?'pos':'neg') + '">' + signed(amt) + '</td>' +
+      '<td style="text-align:right;color:#8b949e">' + pct.toFixed(1) + '%</td>' +
+      '<td><span class="pct-bar" style="width:'+barW+'px;background:'+barColor+'"></span></td>';
     txTbody.appendChild(tr);
   });
-  const net = Object.values(allBk).reduce((a,b)=>a+b,0);
-  const tfoot=document.createElement('tr'); tfoot.className='summary-row';
-  tfoot.innerHTML=`<td>NET TOTAL</td><td style="text-align:right" class="${net>=0?'amount-pos':'amount-neg'}">${fmtSigned(net)}</td><td></td><td></td>`;
-  txTbody.appendChild(tfoot);
+  var net = Object.keys(allBk).reduce(function(a,k){ return a+allBk[k]; }, 0);
+  var netRow = document.createElement('tr');
+  netRow.className = 'net-row';
+  netRow.innerHTML =
+    '<td>NET TOTAL</td>' +
+    '<td style="text-align:right" class="' + (net>=0?'pos':'neg') + '">' + signed(net) + '</td>' +
+    '<td></td><td></td>';
+  txTbody.appendChild(netRow);
 }
 
-function toggleBd(groupId,btn) {
-  const rows=document.querySelectorAll('[data-group="'+groupId+'"]');
-  const isOpen=btn.textContent==='▼';
-  rows.forEach(r=>r.classList.toggle('open',!isOpen));
-  btn.textContent=isOpen?'▶':'▼';
+function toggleGroup(btn) {
+  var groupId = btn.getAttribute('data-group');
+  var rows = document.querySelectorAll('.bd-row[data-group="' + groupId + '"]');
+  var isOpen = btn.getAttribute('data-open') === '1';
+  rows.forEach(function(r) { r.classList.toggle('open', !isOpen); });
+  btn.setAttribute('data-open', isOpen ? '0' : '1');
+  btn.innerHTML = isOpen ? '&#9654;' : '&#9660;';
 }
 
-render();
+window.addEventListener('load', function() { render(); });
 </script>
 </body>
 </html>
