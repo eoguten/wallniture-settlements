@@ -4,14 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wallniture Settlement Dashboard</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#0f1117;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+body{background:#0f1117;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
 header{background:#161b22;border-bottom:1px solid #30363d;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
 header h1{font-size:1.2rem;font-weight:600;color:#f0f6fc}
 .updated{font-size:.75rem;color:#8b949e}
-.container{max-width:1200px;margin:0 auto;padding:24px}
+.container{max-width:1100px;margin:0 auto;padding:24px}
 .filter-bar{display:flex;gap:8px;margin-bottom:24px}
 .filter-btn{padding:6px 18px;border-radius:6px;border:1px solid #30363d;background:#161b22;color:#8b949e;cursor:pointer;font-size:.85rem;transition:all .15s}
 .filter-btn:hover{border-color:#58a6ff;color:#58a6ff}
@@ -22,37 +21,30 @@ header h1{font-size:1.2rem;font-weight:600;color:#f0f6fc}
 .kpi-label{font-size:.7rem;color:#8b949e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
 .kpi-value{font-size:1.5rem;font-weight:700;color:#f0f6fc;line-height:1.2}
 .kpi-sub{font-size:.72rem;color:#8b949e;margin-top:4px}
-.charts-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:24px}
-@media(max-width:700px){.charts-grid{grid-template-columns:1fr}}
-.chart-card{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:20px}
-.chart-card h2{font-size:.75rem;color:#8b949e;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em}
-.chart-note{font-size:.7rem;color:#484f58;margin-bottom:10px}
-.chart-wrap{position:relative;height:260px;width:100%}
-.legend-row{display:flex;gap:16px;margin-bottom:8px;font-size:.75rem;color:#8b949e;flex-wrap:wrap}
-.ld{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:middle}
-table{width:100%;border-collapse:collapse;font-size:.83rem}
-th{text-align:left;padding:9px 12px;color:#8b949e;font-weight:500;border-bottom:1px solid #30363d;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em}
-td{padding:9px 12px;border-bottom:1px solid #21262d;color:#c9d1d9}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:#1c2128}
-.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.7rem;font-weight:600}
-.bs{background:#1c3a6b;color:#4f8ef7}
-.bi{background:#2e1e5c;color:#a78bfa}
-.pos{color:#3fb950}.neg{color:#f85149}
 .table-card{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:20px;margin-bottom:20px;overflow-x:auto}
 .table-card h2{font-size:.75rem;color:#8b949e;margin-bottom:14px;text-transform:uppercase;letter-spacing:.06em}
-.tbtn{background:none;border:none;color:#58a6ff;cursor:pointer;font-size:.8rem;width:24px;text-align:center}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th{text-align:left;padding:9px 14px;color:#8b949e;font-weight:500;border-bottom:1px solid #30363d;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+td{padding:9px 14px;border-bottom:1px solid #21262d;color:#c9d1d9}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#1c2128}
+.badge{display:inline-block;padding:2px 9px;border-radius:4px;font-size:.7rem;font-weight:600}
+.bs{background:#1c3a6b;color:#4f8ef7}
+.bi{background:#2e1e5c;color:#a78bfa}
+.pos{color:#3fb950}
+.neg{color:#f85149}
+.tbtn{background:none;border:none;color:#58a6ff;cursor:pointer;font-size:.8rem;width:24px;text-align:center;line-height:1}
 .bd-row{display:none}
-.bd-row td{background:#0d1117;font-size:.78rem;color:#8b949e;padding:5px 12px 5px 36px}
+.bd-row td{background:#0d1117;font-size:.78rem;color:#8b949e;padding:6px 14px 6px 40px}
 .bd-row.open{display:table-row}
-.pb{display:inline-block;height:8px;border-radius:4px;vertical-align:middle;margin-right:6px}
 .net-row td{font-weight:700;color:#f0f6fc!important;border-top:1px solid #30363d}
+.pb{display:inline-block;height:8px;border-radius:4px;vertical-align:middle;margin-right:6px}
 </style>
 </head>
 <body>
 <header>
   <h1>&#x1F3E6; Wallniture &middot; Settlement Reports</h1>
-  <span class="updated">Last updated: 2026-05-09 23:31 UTC</span>
+  <span class="updated">Last updated: 2026-05-09 23:33 UTC</span>
 </header>
 <div class="container">
   <div class="filter-bar">
@@ -66,40 +58,42 @@ tr:hover td{background:#1c2128}
     <div class="kpi"><div class="kpi-label">Invoiced Orders</div><div class="kpi-value" id="kpi-inv">—</div><div class="kpi-sub" id="kpi-in">—</div></div>
     <div class="kpi"><div class="kpi-label">Avg per Period</div><div class="kpi-value" id="kpi-avg">—</div><div class="kpi-sub">per settlement</div></div>
   </div>
-  <div class="charts-grid">
-    <div class="chart-card">
-      <h2>Disbursements by Period</h2>
-      <div class="legend-row" id="bar-legend"></div>
-      <div class="chart-note" id="bar-note"></div>
-      <div class="chart-wrap"><canvas id="barChart"></canvas></div>
-    </div>
-    <div class="chart-card">
-      <h2>Type Mix</h2>
-      <div class="chart-wrap" style="height:240px"><canvas id="doughnutChart"></canvas></div>
-    </div>
-  </div>
   <div class="table-card">
     <h2>Settlement Periods</h2>
-    <table><thead><tr><th style="width:36px"></th><th>Period</th><th>Type</th><th>Deposit Date</th><th style="text-align:right">Total</th><th>Settlement ID</th></tr></thead>
-    <tbody id="periods-tbody"></tbody></table>
+    <table>
+      <thead><tr>
+        <th style="width:36px"></th>
+        <th>Period</th>
+        <th>Type</th>
+        <th>Deposit Date</th>
+        <th style="text-align:right">Total</th>
+        <th>Settlement ID</th>
+      </tr></thead>
+      <tbody id="periods-tbody"></tbody>
+    </table>
   </div>
   <div class="table-card">
     <h2>Transaction Type Breakdown</h2>
-    <table><thead><tr><th>Transaction Type</th><th style="text-align:right">Amount</th><th style="text-align:right">% of Gross</th><th>Distribution</th></tr></thead>
-    <tbody id="tx-tbody"></tbody></table>
+    <table>
+      <thead><tr>
+        <th>Transaction Type</th>
+        <th style="text-align:right">Amount</th>
+        <th style="text-align:right">% of Gross</th>
+        <th>Distribution</th>
+      </tr></thead>
+      <tbody id="tx-tbody"></tbody>
+    </table>
   </div>
 </div>
 <script>
 var ALL_DATA = [
   {
     "id": "25112857511",
-    "filename": "settlement_2025_12_04_to_12_18.txt",
     "type": "Invoiced",
     "start_date": "2025-12-04",
     "end_date": "2025-12-18",
     "deposit_date": "2025-12-20",
     "total": 2394.19,
-    "currency": "USD",
     "breakdown": {
       "Order": 2437.3,
       "Refund": -43.11
@@ -107,13 +101,11 @@ var ALL_DATA = [
   },
   {
     "id": "25216847031",
-    "filename": "settlement_2025_12_18_to_01_01.txt",
     "type": "Invoiced",
     "start_date": "2025-12-18",
     "end_date": "2026-01-01",
     "deposit_date": "2026-01-03",
     "total": 3018.1,
-    "currency": "USD",
     "breakdown": {
       "Order": 3103.04,
       "Refund": -84.94
@@ -121,13 +113,11 @@ var ALL_DATA = [
   },
   {
     "id": "25297091161",
-    "filename": "settlement_2025_12_29_to_01_12.txt",
     "type": "Standard",
     "start_date": "2025-12-29",
     "end_date": "2026-01-12",
     "deposit_date": "2026-01-14",
     "total": 84981.99,
-    "currency": "USD",
     "breakdown": {
       "FBAFees": -124.56,
       "Liquidations": 241.97,
@@ -140,13 +130,11 @@ var ALL_DATA = [
   },
   {
     "id": "25326529441",
-    "filename": "settlement_2026_01_01_to_01_15.txt",
     "type": "Invoiced",
     "start_date": "2026-01-01",
     "end_date": "2026-01-15",
     "deposit_date": "2026-01-17",
     "total": 3439.36,
-    "currency": "USD",
     "breakdown": {
       "Order": 3564.84,
       "Refund": -125.48
@@ -154,13 +142,11 @@ var ALL_DATA = [
   },
   {
     "id": "25406826951",
-    "filename": "settlement_2026_01_12_to_01_26.txt",
     "type": "Standard",
     "start_date": "2026-01-12",
     "end_date": "2026-01-26",
     "deposit_date": "2026-01-28",
     "total": 65653.03,
-    "currency": "USD",
     "breakdown": {
       "Liquidations": 237.3,
       "Order": 89551.55,
@@ -171,13 +157,11 @@ var ALL_DATA = [
   },
   {
     "id": "25433069931",
-    "filename": "settlement_2026_01_15_to_01_29.txt",
     "type": "Invoiced",
     "start_date": "2026-01-15",
     "end_date": "2026-01-29",
     "deposit_date": "2026-01-31",
     "total": 1851.42,
-    "currency": "USD",
     "breakdown": {
       "Order": 1949.72,
       "Refund": -98.3
@@ -185,13 +169,11 @@ var ALL_DATA = [
   },
   {
     "id": "25510107901",
-    "filename": "settlement_2026_01_26_to_02_09.txt",
     "type": "Standard",
     "start_date": "2026-01-26",
     "end_date": "2026-02-09",
     "deposit_date": "2026-02-11",
     "total": 58289.33,
-    "currency": "USD",
     "breakdown": {
       "FBAFees": -159.04,
       "Liquidations": 167.47,
@@ -204,13 +186,11 @@ var ALL_DATA = [
   },
   {
     "id": "25545112191",
-    "filename": "settlement_2026_01_29_to_02_12.txt",
     "type": "Invoiced",
     "start_date": "2026-01-29",
     "end_date": "2026-02-12",
     "deposit_date": "2026-02-14",
     "total": 1886.88,
-    "currency": "USD",
     "breakdown": {
       "Order": 1921.01,
       "Refund": -34.13
@@ -218,13 +198,11 @@ var ALL_DATA = [
   },
   {
     "id": "25630293521",
-    "filename": "settlement_2026_02_09_to_02_23.txt",
     "type": "Standard",
     "start_date": "2026-02-09",
     "end_date": "2026-02-23",
     "deposit_date": "2026-02-25",
     "total": 61271.91,
-    "currency": "USD",
     "breakdown": {
       "Liquidations": 198.82,
       "Order": 76818.68,
@@ -236,26 +214,22 @@ var ALL_DATA = [
   },
   {
     "id": "25663384241",
-    "filename": "settlement_2026_02_12_to_02_26.txt",
     "type": "Invoiced",
     "start_date": "2026-02-12",
     "end_date": "2026-02-26",
     "deposit_date": "2026-02-28",
     "total": 2148.34,
-    "currency": "USD",
     "breakdown": {
       "Order": 2148.34
     }
   },
   {
     "id": "25739632521",
-    "filename": "settlement_2026_02_23_to_03_09.txt",
     "type": "Standard",
     "start_date": "2026-02-23",
     "end_date": "2026-03-09",
     "deposit_date": "2026-03-11",
     "total": 58200.48,
-    "currency": "USD",
     "breakdown": {
       "FBAFees": -184.05,
       "Liquidations": 184.72,
@@ -268,13 +242,11 @@ var ALL_DATA = [
   },
   {
     "id": "25771433441",
-    "filename": "settlement_2026_02_26_to_03_12.txt",
     "type": "Invoiced",
     "start_date": "2026-02-26",
     "end_date": "2026-03-12",
     "deposit_date": "2026-03-14",
     "total": 3239.37,
-    "currency": "USD",
     "breakdown": {
       "Order": 3502.31,
       "Refund": -262.94
@@ -282,13 +254,11 @@ var ALL_DATA = [
   },
   {
     "id": "25851785651",
-    "filename": "settlement_2026_03_09_to_03_23.txt",
     "type": "Standard",
     "start_date": "2026-03-09",
     "end_date": "2026-03-23",
     "deposit_date": "2026-03-25",
     "total": 50329.83,
-    "currency": "USD",
     "breakdown": {
       "Liquidations": 171.08,
       "Liquidations Adjustments": 0.0,
@@ -301,13 +271,11 @@ var ALL_DATA = [
   },
   {
     "id": "25881415331",
-    "filename": "settlement_2026_03_12_to_03_26.txt",
     "type": "Invoiced",
     "start_date": "2026-03-12",
     "end_date": "2026-03-26",
     "deposit_date": "2026-03-28",
     "total": 4020.87,
-    "currency": "USD",
     "breakdown": {
       "Order": 4104.95,
       "Refund": -84.08
@@ -315,13 +283,11 @@ var ALL_DATA = [
   },
   {
     "id": "25963304161",
-    "filename": "settlement_2026_03_23_to_04_06.txt",
     "type": "Standard",
     "start_date": "2026-03-23",
     "end_date": "2026-04-06",
     "deposit_date": "2026-04-08",
     "total": 6890.09,
-    "currency": "USD",
     "breakdown": {
       "Chargeback Refund": -208.14,
       "Liquidations": 175.17,
@@ -333,26 +299,22 @@ var ALL_DATA = [
   },
   {
     "id": "25995798771",
-    "filename": "settlement_2026_03_26_to_04_09.txt",
     "type": "Invoiced",
     "start_date": "2026-03-26",
     "end_date": "2026-04-09",
     "deposit_date": "2026-04-11",
     "total": 1607.2,
-    "currency": "USD",
     "breakdown": {
       "Order": 1607.2
     }
   },
   {
     "id": "26088228171",
-    "filename": "settlement_2026_04_06_to_04_20.txt",
     "type": "Standard",
     "start_date": "2026-04-06",
     "end_date": "2026-04-20",
     "deposit_date": "2026-04-22",
     "total": 38286.8,
-    "currency": "USD",
     "breakdown": {
       "FBAFees": -91.97,
       "Liquidations": 286.44,
@@ -364,26 +326,22 @@ var ALL_DATA = [
   },
   {
     "id": "26123275341",
-    "filename": "settlement_2026_04_09_to_04_23.txt",
     "type": "Invoiced",
     "start_date": "2026-04-09",
     "end_date": "2026-04-23",
     "deposit_date": "2026-04-25",
     "total": 2571.34,
-    "currency": "USD",
     "breakdown": {
       "Order": 2571.34
     }
   },
   {
     "id": "26216292801",
-    "filename": "settlement_2026_04_20_to_05_04.txt",
     "type": "Standard",
     "start_date": "2026-04-20",
     "end_date": "2026-05-04",
     "deposit_date": "2026-05-06",
     "total": 42110.59,
-    "currency": "USD",
     "breakdown": {
       "Liquidations": 501.81,
       "Order": 58087.53,
@@ -395,20 +353,17 @@ var ALL_DATA = [
   },
   {
     "id": "26255035751",
-    "filename": "settlement_2026_04_23_to_05_07.txt",
     "type": "Invoiced",
     "start_date": "2026-04-23",
     "end_date": "2026-05-07",
     "deposit_date": "2026-05-09",
     "total": 1984.26,
-    "currency": "USD",
     "breakdown": {
       "Order": 1984.26
     }
   }
 ];
 var currentFilter = 'All';
-var barChart = null, doughnutChart = null;
 
 function dollar(v){ return '$'+Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function signed(v){ return (v<0?'-':'')+dollar(v); }
@@ -416,105 +371,18 @@ function filtered(){ return currentFilter==='All'?ALL_DATA:ALL_DATA.filter(funct
 
 function setFilter(btn){
   currentFilter = btn.getAttribute('data-filter');
-  document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.toggle('active',b===btn); });
+  document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.toggle('active', b===btn); });
   render();
-}
-
-function buildBarChart(sorted, filter) {
-  if (barChart){ barChart.destroy(); barChart=null; }
-  var ctx = document.getElementById('barChart').getContext('2d');
-  var legend = document.getElementById('bar-legend');
-  var note   = document.getElementById('bar-note');
-
-  if (filter === 'All') {
-    // Dual-axis: Standard on left (yStd), Invoiced on right (yInv)
-    var stdData=[], invData=[], labels=[];
-    sorted.forEach(function(s){
-      labels.push(s.start_date.slice(5)+' → '+s.end_date.slice(5));
-      stdData.push(s.type==='Standard' ? s.total : null);
-      invData.push(s.type==='Invoiced' ? s.total : null);
-    });
-    legend.innerHTML =
-      '<span><span class="ld" style="background:#4f8ef7"></span>Standard (left axis)</span>' +
-      '<span><span class="ld" style="background:#a78bfa"></span>Invoiced (right axis)</span>';
-    note.textContent = 'Each axis is scaled independently so both order types are clearly visible.';
-    barChart = new Chart(ctx, {
-      type:'bar',
-      data:{
-        labels:labels,
-        datasets:[
-          { label:'Standard', data:stdData, backgroundColor:'#4f8ef7', borderRadius:3, yAxisID:'yStd', spanGaps:false },
-          { label:'Invoiced', data:invData, backgroundColor:'#a78bfa', borderRadius:3, yAxisID:'yInv', spanGaps:false }
-        ]
-      },
-      options:{
-        responsive:true, maintainAspectRatio:false,
-        plugins:{
-          legend:{display:false},
-          tooltip:{
-            callbacks:{
-              label:function(ctx){ return ' '+ctx.dataset.label+': '+dollar(ctx.raw); }
-            }
-          }
-        },
-        scales:{
-          x:{ ticks:{color:'#8b949e',font:{size:9},maxRotation:45,minRotation:30}, grid:{color:'#21262d'} },
-          yStd:{
-            position:'left',
-            ticks:{color:'#4f8ef7',callback:function(v){return '$'+(v/1000).toFixed(0)+'k';}},
-            grid:{color:'#21262d'},
-            title:{display:true, text:'Standard', color:'#4f8ef7', font:{size:10}}
-          },
-          yInv:{
-            position:'right',
-            ticks:{color:'#a78bfa',callback:function(v){return '$'+(v/1000).toFixed(1)+'k';}},
-            grid:{drawOnChartArea:false},
-            title:{display:true, text:'Invoiced', color:'#a78bfa', font:{size:10}}
-          }
-        }
-      }
-    });
-  } else {
-    // Single axis for Standard-only or Invoiced-only
-    var color = filter==='Standard' ? '#4f8ef7' : '#a78bfa';
-    var hcolor = filter==='Standard' ? '#6aa3f9' : '#b89cfc';
-    legend.innerHTML = '<span><span class="ld" style="background:'+color+'"></span>'+filter+' Orders</span>';
-    note.textContent = '';
-    barChart = new Chart(ctx, {
-      type:'bar',
-      data:{
-        labels: sorted.map(function(s){return s.start_date.slice(5)+' → '+s.end_date.slice(5);}),
-        datasets:[{
-          label: filter,
-          data: sorted.map(function(s){return s.total;}),
-          backgroundColor: color,
-          hoverBackgroundColor: hcolor,
-          borderRadius: 3
-        }]
-      },
-      options:{
-        responsive:true, maintainAspectRatio:false,
-        plugins:{
-          legend:{display:false},
-          tooltip:{callbacks:{label:function(ctx){return ' '+dollar(ctx.raw);}}}
-        },
-        scales:{
-          x:{ ticks:{color:'#8b949e',font:{size:9},maxRotation:45,minRotation:30}, grid:{color:'#21262d'} },
-          y:{ ticks:{color:'#8b949e',callback:function(v){return '$'+(v/1000).toFixed(0)+'k';}}, grid:{color:'#21262d'} }
-        }
-      }
-    });
-  }
 }
 
 function render(){
   var data = filtered();
-  var sorted = data.slice().sort(function(a,b){return a.start_date<b.start_date?-1:1;});
-  var std = data.filter(function(s){return s.type==='Standard';});
-  var inv = data.filter(function(s){return s.type==='Invoiced';});
-  var total = data.reduce(function(a,s){return a+s.total;},0);
-  var tStd = std.reduce(function(a,s){return a+s.total;},0);
-  var tInv = inv.reduce(function(a,s){return a+s.total;},0);
+  var sorted = data.slice().sort(function(a,b){ return a.start_date < b.start_date ? -1 : 1; });
+  var std = data.filter(function(s){ return s.type==='Standard'; });
+  var inv = data.filter(function(s){ return s.type==='Invoiced'; });
+  var total = data.reduce(function(a,s){ return a+s.total; }, 0);
+  var tStd  = std.reduce(function(a,s){ return a+s.total; }, 0);
+  var tInv  = inv.reduce(function(a,s){ return a+s.total; }, 0);
 
   document.getElementById('kpi-total').textContent = dollar(total);
   document.getElementById('kpi-n').textContent = data.length+' period'+(data.length!==1?'s':'');
@@ -522,26 +390,14 @@ function render(){
   document.getElementById('kpi-sn').textContent = std.length+' period'+(std.length!==1?'s':'');
   document.getElementById('kpi-inv').textContent = dollar(tInv);
   document.getElementById('kpi-in').textContent = inv.length+' period'+(inv.length!==1?'s':'');
-  document.getElementById('kpi-avg').textContent = dollar(data.length?total/data.length:0);
-
-  buildBarChart(sorted, currentFilter);
-
-  if (doughnutChart){ doughnutChart.destroy(); doughnutChart=null; }
-  doughnutChart = new Chart(document.getElementById('doughnutChart').getContext('2d'),{
-    type:'doughnut',
-    data:{labels:['Standard','Invoiced'],datasets:[{data:[tStd,tInv],backgroundColor:['#4f8ef7','#a78bfa'],borderColor:'#0f1117',borderWidth:3}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{
-      legend:{position:'bottom',labels:{color:'#8b949e',padding:14,boxWidth:12}},
-      tooltip:{callbacks:{label:function(ctx){return ' '+ctx.label+': '+dollar(ctx.raw);}}}
-    }}
-  });
+  document.getElementById('kpi-avg').textContent = dollar(data.length ? total/data.length : 0);
 
   // Periods table
   var tbody = document.getElementById('periods-tbody');
-  tbody.innerHTML='';
-  sorted.forEach(function(s,i){
-    var tr=document.createElement('tr');
-    tr.innerHTML=
+  tbody.innerHTML = '';
+  sorted.forEach(function(s, i){
+    var tr = document.createElement('tr');
+    tr.innerHTML =
       '<td><button class="tbtn" data-group="g'+i+'" data-open="0" onclick="toggleGroup(this)">&#9654;</button></td>'+
       '<td>'+s.start_date+' &rarr; '+s.end_date+'</td>'+
       '<td><span class="badge '+(s.type==='Standard'?'bs':'bi')+'">'+s.type+'</span></td>'+
@@ -550,40 +406,53 @@ function render(){
       '<td style="font-size:.72rem;color:#8b949e">'+s.id+'</td>';
     tbody.appendChild(tr);
     Object.keys(s.breakdown).forEach(function(tx){
-      var amt=s.breakdown[tx], br=document.createElement('tr');
-      br.className='bd-row'; br.setAttribute('data-group','g'+i);
-      br.innerHTML='<td></td><td colspan="3" style="color:#8b949e">'+tx+'</td>'+
-        '<td style="text-align:right" class="'+(amt>=0?'pos':'neg')+'">'+signed(amt)+'</td><td></td>';
+      var amt = s.breakdown[tx];
+      var br = document.createElement('tr');
+      br.className = 'bd-row';
+      br.setAttribute('data-group','g'+i);
+      br.innerHTML =
+        '<td></td>'+
+        '<td colspan="3" style="color:#8b949e">'+tx+'</td>'+
+        '<td style="text-align:right" class="'+(amt>=0?'pos':'neg')+'">'+signed(amt)+'</td>'+
+        '<td></td>';
       tbody.appendChild(br);
     });
   });
 
-  // TX breakdown
-  var bk={};
-  data.forEach(function(s){Object.keys(s.breakdown).forEach(function(k){bk[k]=(bk[k]||0)+s.breakdown[k];});});
-  var gross=Object.keys(bk).reduce(function(a,k){return bk[k]>0?a+bk[k]:a;},0);
-  var tx=Object.keys(bk).map(function(k){return[k,bk[k]];}).sort(function(a,b){return b[1]-a[1];});
-  var tb=document.getElementById('tx-tbody'); tb.innerHTML='';
-  tx.forEach(function(e){
-    var t=e[0],a=e[1],pct=gross>0?Math.abs(a)/gross*100:0;
-    var tr=document.createElement('tr');
-    tr.innerHTML='<td>'+t+'</td>'+
-      '<td style="text-align:right" class="'+(a>=0?'pos':'neg')+'">'+signed(a)+'</td>'+
+  // Transaction breakdown
+  var bk = {};
+  data.forEach(function(s){
+    Object.keys(s.breakdown).forEach(function(k){ bk[k] = (bk[k]||0) + s.breakdown[k]; });
+  });
+  var gross = Object.keys(bk).reduce(function(a,k){ return bk[k]>0 ? a+bk[k] : a; }, 0);
+  var txArr = Object.keys(bk).map(function(k){ return [k, bk[k]]; }).sort(function(a,b){ return b[1]-a[1]; });
+  var tb = document.getElementById('tx-tbody');
+  tb.innerHTML = '';
+  txArr.forEach(function(e){
+    var tx=e[0], amt=e[1], pct=gross>0?Math.abs(amt)/gross*100:0;
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td>'+tx+'</td>'+
+      '<td style="text-align:right" class="'+(amt>=0?'pos':'neg')+'">'+signed(amt)+'</td>'+
       '<td style="text-align:right;color:#8b949e">'+pct.toFixed(1)+'%</td>'+
-      '<td><span class="pb" style="width:'+Math.min(120,pct*1.2)+'px;background:'+(a>=0?'#3fb950':'#f85149')+'"></span></td>';
+      '<td><span class="pb" style="width:'+Math.min(140,pct*1.4)+'px;background:'+(amt>=0?'#3fb950':'#f85149')+'"></span></td>';
     tb.appendChild(tr);
   });
-  var net=Object.keys(bk).reduce(function(a,k){return a+bk[k];},0);
-  var nr=document.createElement('tr'); nr.className='net-row';
-  nr.innerHTML='<td>NET TOTAL</td><td style="text-align:right" class="'+(net>=0?'pos':'neg')+'">'+signed(net)+'</td><td></td><td></td>';
+  var net = Object.keys(bk).reduce(function(a,k){ return a+bk[k]; }, 0);
+  var nr = document.createElement('tr'); nr.className='net-row';
+  nr.innerHTML =
+    '<td>NET TOTAL</td>'+
+    '<td style="text-align:right" class="'+(net>=0?'pos':'neg')+'">'+signed(net)+'</td>'+
+    '<td></td><td></td>';
   tb.appendChild(nr);
 }
 
 function toggleGroup(btn){
-  var g=btn.getAttribute('data-group'), open=btn.getAttribute('data-open')==='1';
-  document.querySelectorAll('.bd-row[data-group="'+g+'"]').forEach(function(r){r.classList.toggle('open',!open);});
-  btn.setAttribute('data-open',open?'0':'1');
-  btn.innerHTML=open?'&#9654;':'&#9660;';
+  var g = btn.getAttribute('data-group');
+  var open = btn.getAttribute('data-open')==='1';
+  document.querySelectorAll('.bd-row[data-group="'+g+'"]').forEach(function(r){ r.classList.toggle('open',!open); });
+  btn.setAttribute('data-open', open?'0':'1');
+  btn.innerHTML = open ? '&#9654;' : '&#9660;';
 }
 
 window.addEventListener('load', function(){ render(); });
