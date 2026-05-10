@@ -3,90 +3,139 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wallniture Settlement Dashboard</title>
+<title>Wallniture Dashboard</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0f1117;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
-header{background:#161b22;border-bottom:1px solid #30363d;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-header h1{font-size:1.2rem;font-weight:600;color:#f0f6fc}
-.updated{font-size:.75rem;color:#8b949e}
+header{background:#161b22;border-bottom:1px solid #30363d;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+header h1{font-size:1.15rem;font-weight:600;color:#f0f6fc}
+.updated{font-size:.72rem;color:#8b949e}
+/* Tab nav */
+.tab-nav{background:#161b22;border-bottom:1px solid #30363d;padding:0 24px;display:flex;gap:0}
+.tab-btn{padding:12px 22px;font-size:.875rem;font-weight:500;color:#8b949e;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s}
+.tab-btn:hover{color:#e2e8f0}
+.tab-btn.active{color:#f0f6fc;border-bottom-color:#1f6feb}
+/* Panels */
+.tab-panel{display:none}
+.tab-panel.active{display:block}
 .container{max-width:1100px;margin:0 auto;padding:24px}
+/* Filter bar (Amazon) */
 .filter-bar{display:flex;gap:8px;margin-bottom:24px}
-.filter-btn{padding:6px 18px;border-radius:6px;border:1px solid #30363d;background:#161b22;color:#8b949e;cursor:pointer;font-size:.85rem;transition:all .15s}
+.filter-btn{padding:5px 16px;border-radius:6px;border:1px solid #30363d;background:#161b22;color:#8b949e;cursor:pointer;font-size:.83rem;transition:all .15s}
 .filter-btn:hover{border-color:#58a6ff;color:#58a6ff}
 .filter-btn.active{background:#1f6feb;border-color:#1f6feb;color:#fff}
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
-@media(max-width:800px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
-.kpi{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:18px}
-.kpi-label{font-size:.7rem;color:#8b949e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
-.kpi-value{font-size:1.5rem;font-weight:700;color:#f0f6fc;line-height:1.2}
-.kpi-sub{font-size:.72rem;color:#8b949e;margin-top:4px}
+/* KPI grid */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.kpi-grid-5{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px}
+@media(max-width:900px){.kpi-grid,.kpi-grid-5{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:16px 18px}
+.kpi-label{font-size:.68rem;color:#8b949e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.kpi-value{font-size:1.4rem;font-weight:700;color:#f0f6fc;line-height:1.2}
+.kpi-sub{font-size:.7rem;color:#8b949e;margin-top:3px}
+/* Table cards */
 .table-card{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:20px;margin-bottom:20px;overflow-x:auto}
-.table-card h2{font-size:.75rem;color:#8b949e;margin-bottom:14px;text-transform:uppercase;letter-spacing:.06em}
-table{width:100%;border-collapse:collapse;font-size:.85rem}
-th{text-align:left;padding:9px 14px;color:#8b949e;font-weight:500;border-bottom:1px solid #30363d;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
-td{padding:9px 14px;border-bottom:1px solid #21262d;color:#c9d1d9}
+.table-card h2{font-size:.73rem;color:#8b949e;margin-bottom:14px;text-transform:uppercase;letter-spacing:.06em}
+table{width:100%;border-collapse:collapse;font-size:.83rem}
+th{text-align:left;padding:8px 12px;color:#8b949e;font-weight:500;border-bottom:1px solid #30363d;font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+td{padding:8px 12px;border-bottom:1px solid #21262d;color:#c9d1d9;white-space:nowrap}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:#1c2128}
-.badge{display:inline-block;padding:2px 9px;border-radius:4px;font-size:.7rem;font-weight:600}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.68rem;font-weight:600}
 .bs{background:#1c3a6b;color:#4f8ef7}
 .bi{background:#2e1e5c;color:#a78bfa}
-.pos{color:#3fb950}
-.neg{color:#f85149}
-.tbtn{background:none;border:none;color:#58a6ff;cursor:pointer;font-size:.8rem;width:24px;text-align:center;line-height:1}
+.pos{color:#3fb950}.neg{color:#f85149}
+.muted{color:#8b949e}
+.tbtn{background:none;border:none;color:#58a6ff;cursor:pointer;font-size:.78rem;width:24px;text-align:center;line-height:1;padding:0}
 .bd-row{display:none}
-.bd-row td{background:#0d1117;font-size:.78rem;color:#8b949e;padding:6px 14px 6px 40px}
+.bd-row td{background:#0d1117;font-size:.78rem;color:#8b949e;padding:6px 12px 6px 40px}
 .bd-row.open{display:table-row}
 .net-row td{font-weight:700;color:#f0f6fc!important;border-top:1px solid #30363d}
-.pb{display:inline-block;height:8px;border-radius:4px;vertical-align:middle;margin-right:6px}
+.pb{display:inline-block;height:7px;border-radius:4px;vertical-align:middle;margin-right:5px}
+/* Wayfair year rows */
+.yr-row td{background:#161b22;font-weight:600;color:#e2e8f0}
+.mo-row{display:none}
+.mo-row td{background:#0d1117;font-size:.8rem;color:#8b949e;padding:7px 12px 7px 38px}
+.mo-row.open{display:table-row}
+.mo-row td:first-child{padding-left:12px}
+.tag-wf{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.68rem;font-weight:600;background:#1a3a1a;color:#3fb950}
 </style>
 </head>
 <body>
 <header>
-  <h1>&#x1F3E6; Wallniture &middot; Settlement Reports</h1>
-  <span class="updated">Last updated: 2026-05-09 23:33 UTC</span>
+  <h1>&#x1F3E6; Wallniture &middot; Operations Dashboard</h1>
+  <span class="updated">Last updated: 2026-05-10 01:41 UTC</span>
 </header>
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('amazon',this)">Amazon Settlements</button>
+  <button class="tab-btn" onclick="switchTab('wayfair',this)">Wayfair Remittances</button>
+</nav>
+
+<!-- ═══════════════════════ AMAZON TAB ═══════════════════════ -->
+<div id="tab-amazon" class="tab-panel active">
 <div class="container">
   <div class="filter-bar">
-    <button class="filter-btn active" data-filter="All" onclick="setFilter(this)">All Periods</button>
-    <button class="filter-btn" data-filter="Standard" onclick="setFilter(this)">Standard Orders</button>
-    <button class="filter-btn" data-filter="Invoiced" onclick="setFilter(this)">Invoiced Orders</button>
+    <button class="filter-btn active" data-filter="All" onclick="setAmazonFilter(this)">All Periods</button>
+    <button class="filter-btn" data-filter="Standard" onclick="setAmazonFilter(this)">Standard Orders</button>
+    <button class="filter-btn" data-filter="Invoiced" onclick="setAmazonFilter(this)">Invoiced Orders</button>
   </div>
   <div class="kpi-grid">
-    <div class="kpi"><div class="kpi-label">Total Disbursed</div><div class="kpi-value" id="kpi-total">—</div><div class="kpi-sub" id="kpi-n">—</div></div>
-    <div class="kpi"><div class="kpi-label">Standard Orders</div><div class="kpi-value" id="kpi-std">—</div><div class="kpi-sub" id="kpi-sn">—</div></div>
-    <div class="kpi"><div class="kpi-label">Invoiced Orders</div><div class="kpi-value" id="kpi-inv">—</div><div class="kpi-sub" id="kpi-in">—</div></div>
-    <div class="kpi"><div class="kpi-label">Avg per Period</div><div class="kpi-value" id="kpi-avg">—</div><div class="kpi-sub">per settlement</div></div>
+    <div class="kpi"><div class="kpi-label">Total Disbursed</div><div class="kpi-value" id="a-total">—</div><div class="kpi-sub" id="a-n">—</div></div>
+    <div class="kpi"><div class="kpi-label">Standard Orders</div><div class="kpi-value" id="a-std">—</div><div class="kpi-sub" id="a-sn">—</div></div>
+    <div class="kpi"><div class="kpi-label">Invoiced Orders</div><div class="kpi-value" id="a-inv">—</div><div class="kpi-sub" id="a-in">—</div></div>
+    <div class="kpi"><div class="kpi-label">Avg per Period</div><div class="kpi-value" id="a-avg">—</div><div class="kpi-sub">per settlement</div></div>
   </div>
   <div class="table-card">
     <h2>Settlement Periods</h2>
-    <table>
-      <thead><tr>
-        <th style="width:36px"></th>
-        <th>Period</th>
-        <th>Type</th>
-        <th>Deposit Date</th>
-        <th style="text-align:right">Total</th>
-        <th>Settlement ID</th>
-      </tr></thead>
-      <tbody id="periods-tbody"></tbody>
-    </table>
+    <table><thead><tr>
+      <th style="width:32px"></th><th>Period</th><th>Type</th><th>Deposit Date</th>
+      <th style="text-align:right">Total</th><th>Settlement ID</th>
+    </tr></thead><tbody id="a-periods-tbody"></tbody></table>
   </div>
   <div class="table-card">
     <h2>Transaction Type Breakdown</h2>
-    <table>
+    <table><thead><tr>
+      <th>Transaction Type</th><th style="text-align:right">Amount</th>
+      <th style="text-align:right">% of Gross</th><th>Distribution</th>
+    </tr></thead><tbody id="a-tx-tbody"></tbody></table>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════ WAYFAIR TAB ═══════════════════════ -->
+<div id="tab-wayfair" class="tab-panel">
+<div class="container">
+  <div class="kpi-grid-5" id="wf-kpis">
+    <div class="kpi"><div class="kpi-label">Gross Sales</div><div class="kpi-value" id="w-product">—</div><div class="kpi-sub" id="w-n">—</div></div>
+    <div class="kpi"><div class="kpi-label">Net Sales</div><div class="kpi-value" id="w-payment">—</div><div class="kpi-sub" id="w-fee">—</div></div>
+    <div class="kpi"><div class="kpi-label">COGS</div><div class="kpi-value" id="w-cogs">—</div><div class="kpi-sub" id="w-cogs-pct">—</div></div>
+    <div class="kpi"><div class="kpi-label">Gross Profit</div><div class="kpi-value" id="w-gp">—</div><div class="kpi-sub" id="w-gm">—</div></div>
+    <div class="kpi"><div class="kpi-label">Remittances</div><div class="kpi-value" id="w-rem">—</div><div class="kpi-sub">unique payments</div></div>
+  </div>
+  <div class="table-card">
+    <h2>Remittance Summary by Year &amp; Month</h2>
+    <table id="wf-table">
       <thead><tr>
-        <th>Transaction Type</th>
-        <th style="text-align:right">Amount</th>
-        <th style="text-align:right">% of Gross</th>
-        <th>Distribution</th>
+        <th style="width:32px"></th>
+        <th>Period</th>
+        <th style="text-align:right">Gross Sales</th>
+        <th style="text-align:right">Net Sales</th>
+        <th style="text-align:right">Fees</th>
+        <th style="text-align:right">Fee %</th>
+        <th style="text-align:right">COGS</th>
+        <th style="text-align:right">COGS %</th>
+        <th style="text-align:right">Gross Profit</th>
+        <th style="text-align:right">Margin %</th>
+        <th style="text-align:right">Remittances</th>
       </tr></thead>
-      <tbody id="tx-tbody"></tbody>
+      <tbody id="wf-tbody"></tbody>
     </table>
   </div>
 </div>
+</div>
+
 <script>
-var ALL_DATA = [
+// ── Data ──────────────────────────────────────────────────────
+var AMAZON_DATA  = [
   {
     "id": "25112857511",
     "type": "Invoiced",
@@ -363,99 +412,451 @@ var ALL_DATA = [
     }
   }
 ];
-var currentFilter = 'All';
+var WAYFAIR_DATA = [
+  {
+    "year": 2025,
+    "product": 808033.52,
+    "payment": 734250.43,
+    "cogs": 314088.67,
+    "fee_amt": 73783.09,
+    "gross_profit": 420161.76,
+    "fee_pct": 9.1,
+    "cogs_pct": 38.9,
+    "gm_pct": 57.2,
+    "remittances": 132,
+    "rows": 16262,
+    "months": [
+      {
+        "month": 1,
+        "month_name": "Jan",
+        "product": 70571.26,
+        "payment": 64212.78,
+        "cogs": 29677.63,
+        "fee_amt": 6358.48,
+        "gross_profit": 34535.15,
+        "fee_pct": 9.0,
+        "cogs_pct": 42.1,
+        "gm_pct": 53.8,
+        "remittances": 16,
+        "rows": 1635
+      },
+      {
+        "month": 2,
+        "month_name": "Feb",
+        "product": 56743.68,
+        "payment": 52154.07,
+        "cogs": 23475.33,
+        "fee_amt": 4589.61,
+        "gross_profit": 28678.74,
+        "fee_pct": 8.1,
+        "cogs_pct": 41.4,
+        "gm_pct": 55.0,
+        "remittances": 12,
+        "rows": 1329
+      },
+      {
+        "month": 3,
+        "month_name": "Mar",
+        "product": 30903.83,
+        "payment": 27219.39,
+        "cogs": 12241.43,
+        "fee_amt": 3684.44,
+        "gross_profit": 14977.96,
+        "fee_pct": 11.9,
+        "cogs_pct": 39.6,
+        "gm_pct": 55.0,
+        "remittances": 4,
+        "rows": 740
+      },
+      {
+        "month": 4,
+        "month_name": "Apr",
+        "product": 109771.21,
+        "payment": 101215.54,
+        "cogs": 43487.38,
+        "fee_amt": 8555.67,
+        "gross_profit": 57728.16,
+        "fee_pct": 7.8,
+        "cogs_pct": 39.6,
+        "gm_pct": 57.0,
+        "remittances": 13,
+        "rows": 2332
+      },
+      {
+        "month": 5,
+        "month_name": "May",
+        "product": 63015.56,
+        "payment": 56243.89,
+        "cogs": 24958.08,
+        "fee_amt": 6771.67,
+        "gross_profit": 31285.81,
+        "fee_pct": 10.7,
+        "cogs_pct": 39.6,
+        "gm_pct": 55.6,
+        "remittances": 13,
+        "rows": 1294
+      },
+      {
+        "month": 6,
+        "month_name": "Jun",
+        "product": 50382.62,
+        "payment": 46684.61,
+        "cogs": 19488.49,
+        "fee_amt": 3698.01,
+        "gross_profit": 27196.12,
+        "fee_pct": 7.3,
+        "cogs_pct": 38.7,
+        "gm_pct": 58.3,
+        "remittances": 6,
+        "rows": 1005
+      },
+      {
+        "month": 7,
+        "month_name": "Jul",
+        "product": 61674.74,
+        "payment": 57003.18,
+        "cogs": 23912.64,
+        "fee_amt": 4671.56,
+        "gross_profit": 33090.54,
+        "fee_pct": 7.6,
+        "cogs_pct": 38.8,
+        "gm_pct": 58.1,
+        "remittances": 12,
+        "rows": 1217
+      },
+      {
+        "month": 8,
+        "month_name": "Aug",
+        "product": 61965.48,
+        "payment": 56636.48,
+        "cogs": 23987.71,
+        "fee_amt": 5329.0,
+        "gross_profit": 32648.77,
+        "fee_pct": 8.6,
+        "cogs_pct": 38.7,
+        "gm_pct": 57.6,
+        "remittances": 13,
+        "rows": 1243
+      },
+      {
+        "month": 9,
+        "month_name": "Sep",
+        "product": 46527.77,
+        "payment": 43120.53,
+        "cogs": 17686.27,
+        "fee_amt": 3407.24,
+        "gross_profit": 25434.26,
+        "fee_pct": 7.3,
+        "cogs_pct": 38.0,
+        "gm_pct": 59.0,
+        "remittances": 10,
+        "rows": 904
+      },
+      {
+        "month": 10,
+        "month_name": "Oct",
+        "product": 133955.25,
+        "payment": 117496.27,
+        "cogs": 49740.69,
+        "fee_amt": 16458.98,
+        "gross_profit": 67755.58,
+        "fee_pct": 12.3,
+        "cogs_pct": 37.1,
+        "gm_pct": 57.7,
+        "remittances": 12,
+        "rows": 2339
+      },
+      {
+        "month": 11,
+        "month_name": "Nov",
+        "product": 70584.91,
+        "payment": 64441.58,
+        "cogs": 26072.86,
+        "fee_amt": 6143.33,
+        "gross_profit": 38368.72,
+        "fee_pct": 8.7,
+        "cogs_pct": 36.9,
+        "gm_pct": 59.5,
+        "remittances": 11,
+        "rows": 1249
+      },
+      {
+        "month": 12,
+        "month_name": "Dec",
+        "product": 51937.21,
+        "payment": 47822.11,
+        "cogs": 19360.16,
+        "fee_amt": 4115.1,
+        "gross_profit": 28461.95,
+        "fee_pct": 7.9,
+        "cogs_pct": 37.3,
+        "gm_pct": 59.5,
+        "remittances": 10,
+        "rows": 975
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "product": 395879.08,
+    "payment": 362543.49,
+    "cogs": 147002.94,
+    "fee_amt": 33335.59,
+    "gross_profit": 215540.55,
+    "fee_pct": 8.4,
+    "cogs_pct": 37.1,
+    "gm_pct": 59.5,
+    "remittances": 48,
+    "rows": 6760,
+    "months": [
+      {
+        "month": 1,
+        "month_name": "Jan",
+        "product": 118601.92,
+        "payment": 108826.75,
+        "cogs": 46832.62,
+        "fee_amt": 9775.17,
+        "gross_profit": 61994.13,
+        "fee_pct": 8.2,
+        "cogs_pct": 39.5,
+        "gm_pct": 57.0,
+        "remittances": 11,
+        "rows": 2172
+      },
+      {
+        "month": 2,
+        "month_name": "Feb",
+        "product": 69420.44,
+        "payment": 63288.3,
+        "cogs": 25396.49,
+        "fee_amt": 6132.14,
+        "gross_profit": 37891.81,
+        "fee_pct": 8.8,
+        "cogs_pct": 36.6,
+        "gm_pct": 59.9,
+        "remittances": 10,
+        "rows": 1266
+      },
+      {
+        "month": 3,
+        "month_name": "Mar",
+        "product": 73649.02,
+        "payment": 66648.23,
+        "cogs": 26530.38,
+        "fee_amt": 7000.79,
+        "gross_profit": 40117.85,
+        "fee_pct": 9.5,
+        "cogs_pct": 36.0,
+        "gm_pct": 60.2,
+        "remittances": 11,
+        "rows": 1280
+      },
+      {
+        "month": 4,
+        "month_name": "Apr",
+        "product": 99053.84,
+        "payment": 91200.85,
+        "cogs": 35291.64,
+        "fee_amt": 7852.99,
+        "gross_profit": 55909.21,
+        "fee_pct": 7.9,
+        "cogs_pct": 35.6,
+        "gm_pct": 61.3,
+        "remittances": 12,
+        "rows": 1543
+      },
+      {
+        "month": 5,
+        "month_name": "May",
+        "product": 35153.86,
+        "payment": 32579.36,
+        "cogs": 12951.81,
+        "fee_amt": 2574.5,
+        "gross_profit": 19627.55,
+        "fee_pct": 7.3,
+        "cogs_pct": 36.8,
+        "gm_pct": 60.2,
+        "remittances": 4,
+        "rows": 499
+      }
+    ]
+  }
+];
 
+// ── Utilities ─────────────────────────────────────────────────
 function dollar(v){ return '$'+Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function signed(v){ return (v<0?'-':'')+dollar(v); }
-function filtered(){ return currentFilter==='All'?ALL_DATA:ALL_DATA.filter(function(s){return s.type===currentFilter;}); }
+function pct(v){ return v.toFixed(1)+'%'; }
 
-function setFilter(btn){
-  currentFilter = btn.getAttribute('data-filter');
-  document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.toggle('active', b===btn); });
-  render();
+// ── Tab switching ─────────────────────────────────────────────
+function switchTab(name, btn){
+  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
 }
 
-function render(){
-  var data = filtered();
+// ══════════════════════════════════════════════════════════════
+// AMAZON
+// ══════════════════════════════════════════════════════════════
+var amazonFilter = 'All';
+
+function filteredAmazon(){
+  return amazonFilter==='All' ? AMAZON_DATA : AMAZON_DATA.filter(function(s){return s.type===amazonFilter;});
+}
+
+function setAmazonFilter(btn){
+  amazonFilter = btn.getAttribute('data-filter');
+  document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.toggle('active', b===btn); });
+  renderAmazon();
+}
+
+function renderAmazon(){
+  var data = filteredAmazon();
+  // newest first
   var sorted = data.slice().sort(function(a,b){ return a.start_date > b.start_date ? -1 : 1; });
-  var std = data.filter(function(s){ return s.type==='Standard'; });
-  var inv = data.filter(function(s){ return s.type==='Invoiced'; });
-  var total = data.reduce(function(a,s){ return a+s.total; }, 0);
-  var tStd  = std.reduce(function(a,s){ return a+s.total; }, 0);
-  var tInv  = inv.reduce(function(a,s){ return a+s.total; }, 0);
+  var std = data.filter(function(s){return s.type==='Standard';});
+  var inv = data.filter(function(s){return s.type==='Invoiced';});
+  var total = data.reduce(function(a,s){return a+s.total;},0);
+  var tStd  = std.reduce(function(a,s){return a+s.total;},0);
+  var tInv  = inv.reduce(function(a,s){return a+s.total;},0);
 
-  document.getElementById('kpi-total').textContent = dollar(total);
-  document.getElementById('kpi-n').textContent = data.length+' period'+(data.length!==1?'s':'');
-  document.getElementById('kpi-std').textContent = dollar(tStd);
-  document.getElementById('kpi-sn').textContent = std.length+' period'+(std.length!==1?'s':'');
-  document.getElementById('kpi-inv').textContent = dollar(tInv);
-  document.getElementById('kpi-in').textContent = inv.length+' period'+(inv.length!==1?'s':'');
-  document.getElementById('kpi-avg').textContent = dollar(data.length ? total/data.length : 0);
+  document.getElementById('a-total').textContent = dollar(total);
+  document.getElementById('a-n').textContent = data.length+' period'+(data.length!==1?'s':'');
+  document.getElementById('a-std').textContent = dollar(tStd);
+  document.getElementById('a-sn').textContent = std.length+' period'+(std.length!==1?'s':'');
+  document.getElementById('a-inv').textContent = dollar(tInv);
+  document.getElementById('a-in').textContent = inv.length+' period'+(inv.length!==1?'s':'');
+  document.getElementById('a-avg').textContent = dollar(data.length ? total/data.length : 0);
 
-  // Periods table
-  var tbody = document.getElementById('periods-tbody');
-  tbody.innerHTML = '';
-  sorted.forEach(function(s, i){
-    var tr = document.createElement('tr');
-    tr.innerHTML =
-      '<td><button class="tbtn" data-group="g'+i+'" data-open="0" onclick="toggleGroup(this)">&#9654;</button></td>'+
+  var tbody = document.getElementById('a-periods-tbody');
+  tbody.innerHTML='';
+  sorted.forEach(function(s,i){
+    var tr=document.createElement('tr');
+    tr.innerHTML=
+      '<td><button class="tbtn" data-group="ag'+i+'" data-open="0" onclick="toggleGroup(this)">&#9654;</button></td>'+
       '<td>'+s.start_date+' &rarr; '+s.end_date+'</td>'+
       '<td><span class="badge '+(s.type==='Standard'?'bs':'bi')+'">'+s.type+'</span></td>'+
       '<td>'+s.deposit_date+'</td>'+
       '<td style="text-align:right" class="'+(s.total>=0?'pos':'neg')+'">'+signed(s.total)+'</td>'+
-      '<td style="font-size:.72rem;color:#8b949e">'+s.id+'</td>';
+      '<td class="muted" style="font-size:.72rem">'+s.id+'</td>';
     tbody.appendChild(tr);
     Object.keys(s.breakdown).forEach(function(tx){
-      var amt = s.breakdown[tx];
-      var br = document.createElement('tr');
-      br.className = 'bd-row';
-      br.setAttribute('data-group','g'+i);
-      br.innerHTML =
-        '<td></td>'+
-        '<td colspan="3" style="color:#8b949e">'+tx+'</td>'+
-        '<td style="text-align:right" class="'+(amt>=0?'pos':'neg')+'">'+signed(amt)+'</td>'+
-        '<td></td>';
+      var amt=s.breakdown[tx], br=document.createElement('tr');
+      br.className='bd-row'; br.setAttribute('data-group','ag'+i);
+      br.innerHTML='<td></td><td colspan="3" style="color:#8b949e">'+tx+'</td>'+
+        '<td style="text-align:right" class="'+(amt>=0?'pos':'neg')+'">'+signed(amt)+'</td><td></td>';
       tbody.appendChild(br);
     });
   });
 
-  // Transaction breakdown
-  var bk = {};
-  data.forEach(function(s){
-    Object.keys(s.breakdown).forEach(function(k){ bk[k] = (bk[k]||0) + s.breakdown[k]; });
-  });
-  var gross = Object.keys(bk).reduce(function(a,k){ return bk[k]>0 ? a+bk[k] : a; }, 0);
-  var txArr = Object.keys(bk).map(function(k){ return [k, bk[k]]; }).sort(function(a,b){ return b[1]-a[1]; });
-  var tb = document.getElementById('tx-tbody');
-  tb.innerHTML = '';
+  var bk={};
+  data.forEach(function(s){Object.keys(s.breakdown).forEach(function(k){bk[k]=(bk[k]||0)+s.breakdown[k];});});
+  var gross=Object.keys(bk).reduce(function(a,k){return bk[k]>0?a+bk[k]:a;},0);
+  var txArr=Object.keys(bk).map(function(k){return[k,bk[k]];}).sort(function(a,b){return b[1]-a[1];});
+  var tb=document.getElementById('a-tx-tbody'); tb.innerHTML='';
   txArr.forEach(function(e){
-    var tx=e[0], amt=e[1], pct=gross>0?Math.abs(amt)/gross*100:0;
-    var tr = document.createElement('tr');
-    tr.innerHTML =
-      '<td>'+tx+'</td>'+
-      '<td style="text-align:right" class="'+(amt>=0?'pos':'neg')+'">'+signed(amt)+'</td>'+
-      '<td style="text-align:right;color:#8b949e">'+pct.toFixed(1)+'%</td>'+
-      '<td><span class="pb" style="width:'+Math.min(140,pct*1.4)+'px;background:'+(amt>=0?'#3fb950':'#f85149')+'"></span></td>';
+    var t=e[0],a=e[1],p=gross>0?Math.abs(a)/gross*100:0;
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td>'+t+'</td>'+
+      '<td style="text-align:right" class="'+(a>=0?'pos':'neg')+'">'+signed(a)+'</td>'+
+      '<td style="text-align:right;color:#8b949e">'+p.toFixed(1)+'%</td>'+
+      '<td><span class="pb" style="width:'+Math.min(140,p*1.4)+'px;background:'+(a>=0?'#3fb950':'#f85149')+'"></span></td>';
     tb.appendChild(tr);
   });
-  var net = Object.keys(bk).reduce(function(a,k){ return a+bk[k]; }, 0);
-  var nr = document.createElement('tr'); nr.className='net-row';
-  nr.innerHTML =
-    '<td>NET TOTAL</td>'+
-    '<td style="text-align:right" class="'+(net>=0?'pos':'neg')+'">'+signed(net)+'</td>'+
-    '<td></td><td></td>';
+  var net=Object.keys(bk).reduce(function(a,k){return a+bk[k];},0);
+  var nr=document.createElement('tr'); nr.className='net-row';
+  nr.innerHTML='<td>NET TOTAL</td><td style="text-align:right" class="'+(net>=0?'pos':'neg')+'">'+signed(net)+'</td><td></td><td></td>';
   tb.appendChild(nr);
 }
 
-function toggleGroup(btn){
-  var g = btn.getAttribute('data-group');
-  var open = btn.getAttribute('data-open')==='1';
-  document.querySelectorAll('.bd-row[data-group="'+g+'"]').forEach(function(r){ r.classList.toggle('open',!open); });
-  btn.setAttribute('data-open', open?'0':'1');
-  btn.innerHTML = open ? '&#9654;' : '&#9660;';
+// ══════════════════════════════════════════════════════════════
+// WAYFAIR
+// ══════════════════════════════════════════════════════════════
+function renderWayfair(){
+  var data = WAYFAIR_DATA;
+  // Overall KPIs (all years)
+  var totProd=0, totPay=0, totCogs=0, totRem=0;
+  data.forEach(function(y){
+    totProd += y.product; totPay += y.payment;
+    totCogs += y.cogs;   totRem += y.remittances;
+  });
+  var totGP  = totPay - totCogs;
+  var totFee = totProd - totPay;
+
+  document.getElementById('w-product').textContent = dollar(totProd);
+  document.getElementById('w-n').textContent = data.length+' year'+(data.length!==1?'s':'');
+  document.getElementById('w-payment').textContent = dollar(totPay);
+  document.getElementById('w-fee').textContent = 'Fees: '+dollar(totFee)+' ('+pct(totProd?totFee/totProd*100:0)+')';
+  document.getElementById('w-cogs').textContent = dollar(totCogs);
+  document.getElementById('w-cogs-pct').textContent = pct(totProd?totCogs/totProd*100:0)+' of Gross Sales';
+  document.getElementById('w-gp').textContent = signed(totGP);
+  document.getElementById('w-gm').textContent = 'Margin: '+pct(totPay?totGP/totPay*100:0);
+  document.getElementById('w-rem').textContent = totRem.toLocaleString();
+
+  var tbody = document.getElementById('wf-tbody');
+  tbody.innerHTML='';
+  // newest year first
+  var sorted = data.slice().sort(function(a,b){ return b.year - a.year; });
+  sorted.forEach(function(y, i){
+    // Year summary row
+    var yr = document.createElement('tr');
+    yr.className='yr-row';
+    yr.innerHTML=
+      '<td><button class="tbtn" data-group="wg'+i+'" data-open="0" onclick="toggleWfGroup(this)">&#9654;</button></td>'+
+      '<td><strong>'+y.year+'</strong></td>'+
+      '<td style="text-align:right">'+dollar(y.product)+'</td>'+
+      '<td style="text-align:right">'+dollar(y.payment)+'</td>'+
+      '<td style="text-align:right" class="neg">'+dollar(y.fee_amt)+'</td>'+
+      '<td style="text-align:right" class="neg">'+pct(y.fee_pct)+'</td>'+
+      '<td style="text-align:right" class="neg">'+dollar(y.cogs)+'</td>'+
+      '<td style="text-align:right" class="neg">'+pct(y.cogs_pct)+'</td>'+
+      '<td style="text-align:right" class="'+(y.gross_profit>=0?'pos':'neg')+'">'+signed(y.gross_profit)+'</td>'+
+      '<td style="text-align:right" class="'+(y.gm_pct>=0?'pos':'neg')+'">'+pct(y.gm_pct)+'</td>'+
+      '<td style="text-align:right" class="muted">'+y.remittances+'</td>';
+    tbody.appendChild(yr);
+
+    // Month rows (newest first within year)
+    var monthsSorted = y.months.slice().sort(function(a,b){ return b.month - a.month; });
+    monthsSorted.forEach(function(m){
+      var mr = document.createElement('tr');
+      mr.className='mo-row';
+      mr.setAttribute('data-group','wg'+i);
+      mr.innerHTML=
+        '<td></td>'+
+        '<td style="padding-left:38px;color:#c9d1d9">'+m.month_name+' '+y.year+'</td>'+
+        '<td style="text-align:right;color:#c9d1d9">'+dollar(m.product)+'</td>'+
+        '<td style="text-align:right;color:#c9d1d9">'+dollar(m.payment)+'</td>'+
+        '<td style="text-align:right" class="neg">'+dollar(m.fee_amt)+'</td>'+
+        '<td style="text-align:right" class="neg">'+pct(m.fee_pct)+'</td>'+
+        '<td style="text-align:right" class="neg">'+dollar(m.cogs)+'</td>'+
+        '<td style="text-align:right" class="neg">'+pct(m.cogs_pct)+'</td>'+
+        '<td style="text-align:right" class="'+(m.gross_profit>=0?'pos':'neg')+'">'+signed(m.gross_profit)+'</td>'+
+        '<td style="text-align:right" class="'+(m.gm_pct>=0?'pos':'neg')+'">'+pct(m.gm_pct)+'</td>'+
+        '<td style="text-align:right" class="muted">'+m.remittances+'</td>';
+      tbody.appendChild(mr);
+    });
+  });
 }
 
-window.addEventListener('load', function(){ render(); });
+// ── Shared toggle ─────────────────────────────────────────────
+function toggleGroup(btn){
+  var g=btn.getAttribute('data-group'), open=btn.getAttribute('data-open')==='1';
+  document.querySelectorAll('.bd-row[data-group="'+g+'"]').forEach(function(r){r.classList.toggle('open',!open);});
+  btn.setAttribute('data-open',open?'0':'1');
+  btn.innerHTML=open?'&#9654;':'&#9660;';
+}
+function toggleWfGroup(btn){
+  var g=btn.getAttribute('data-group'), open=btn.getAttribute('data-open')==='1';
+  document.querySelectorAll('.mo-row[data-group="'+g+'"]').forEach(function(r){r.classList.toggle('open',!open);});
+  btn.setAttribute('data-open',open?'0':'1');
+  btn.innerHTML=open?'&#9654;':'&#9660;';
+}
+
+window.addEventListener('load', function(){
+  renderAmazon();
+  renderWayfair();
+});
 </script>
 </body>
 </html>
